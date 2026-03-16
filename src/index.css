@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+}
+
+::selection{
+  background-color: #24597aa1;
+  color: #ffffff;
+}
+
+.heading {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.profile-menu {
+  background: linear-gradient(180deg, #141414, #0f0f0f);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  border-radius: 16px;
+}
+
+.hero-dome {
+  position: relative;
+  height: 90vh;
+  width: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #0d021f, #02010a);
+}
+
+.hero-dome > div {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Disable pointer capture */
+.hero-dome canvas,
+.hero-dome .sphere-root {
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Text layer */
+.hero-content {
+  position: relative;
+  z-index: 5;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 8vw;
+  color: white;
+}
+
+.hero-content h1 {
+  font-size: 3.2rem;
+  max-width: 550px;
+  line-height: 1.1;
+}
+
+.hero-content p {
+  opacity: 0.75;
+  margin-top: 12px;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 3px; 
+    height: 7px;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #FFC509; 
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e6b108;
+  }
+}
+@layer utilities {
+  .mask-fade-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  }
+
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 3px;
+  }
+}
