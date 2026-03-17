@@ -3,7 +3,7 @@ import { useWatchlist } from "../context/WatchlistContext";
 import QuickViewModal from "../components/modals/QuickViewModal";
 import FadeLoader from "react-spinners/FadeLoader";
 import GoBackBtn from "../components/ui/GoBackBtn";
-import { LucideTrash } from "lucide-react"; // Modern Lucide icon
+import { LucideTrash } from "lucide-react"; 
 import { motion, AnimatePresence } from "framer-motion";
 
 const Watchlist = () => {
@@ -20,7 +20,13 @@ const Watchlist = () => {
   }
 
   return (
-    <div className="px-8 py-6 min-h-screen bg-transparent text-white">
+    <motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+>
+  {/* Page Content */}
+    <div className="px-8 pt-20 py-6 min-h-screen bg-transparent text-white">
       <GoBackBtn />
       
       <header className="mb-12">
@@ -45,69 +51,80 @@ const Watchlist = () => {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
-          {watchlist.map((movie) => (
-            <motion.div 
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              key={movie.id} 
-              className="group relative"
-            >
-              {/* Custom Tooltip */}
-              <AnimatePresence>
-                {hoveredId === movie.id && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute -top-10 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-[10px] font-bold px-3 py-1 rounded-md shadow-xl whitespace-nowrap pointer-events-none"
-                  >
-                    REMOVE FROM LIST
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45"></div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          <AnimatePresence mode="popLayout"> {/* Added for smoother removals */}
+            {watchlist.map((movie) => (
+              <motion.div 
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                key={movie.id} 
+                className="group relative"
+              >
+                <AnimatePresence>
+                  {hoveredId === movie.id && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute -top-10 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-[10px] font-bold px-3 py-1 rounded-md shadow-xl whitespace-nowrap pointer-events-none"
+                    >
+                      REMOVE FROM LIST
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45"></div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-              <div className="relative overflow-hidden rounded-2xl aspect-[2/3] bg-white/5 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-[#FFC509]/50 group-hover:shadow-[#FFC509]/10">
-                <img
-                  src={movie.poster_path 
-                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
-                    : "https://via.placeholder.com/500x750?text=No+Poster"}
-                  onClick={() => setSelectedMovie(movie)}
-                  className="w-full h-full object-cover cursor-pointer group-hover:scale-110 transition-transform duration-700"
-                  alt={movie.title}
-                />
-                
-                {/* Delete Button Container */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button
-                    onMouseEnter={() => setHoveredId(movie.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => removeFromWatchlist(movie.id)}
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-white font-bold text-xs hover:bg-red-600 transition-colors shadow-lg shadow-red-500/40"
-                  >
-                    <LucideTrash size={14} strokeWidth={3} />
-                    REMOVE
-                  </button>
+                <div 
+                  className="relative overflow-hidden rounded-2xl aspect-[2/3] bg-white/5 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-[#FFC509]/50 group-hover:shadow-[#FFC509]/10 cursor-pointer"
+                  onClick={() => setSelectedMovie(movie)} // Moved onClick here to ensure it catches the click
+                >
+                  <img
+                    src={movie.poster_path 
+                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
+                      : "https://via.placeholder.com/500x750?text=No+Poster"}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    alt={movie.title}
+                  />
+                  
+                  {/* Delete Button Container */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button
+                      onMouseEnter={() => setHoveredId(movie.id)}
+                      onMouseLeave={() => setHoveredId(null)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // CRITICAL: Stops the modal from opening when clicking remove
+                        removeFromWatchlist(movie.id);
+                      }}
+                      className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-white font-bold text-xs hover:bg-red-600 transition-colors shadow-lg shadow-red-500/40"
+                    >
+                      <LucideTrash size={14} strokeWidth={3} />
+                      REMOVE
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <h3 className="mt-4 text-sm font-bold truncate group-hover:text-[#FFC509] transition-colors">
-                {movie.title}
-              </h3>
-            </motion.div>
-          ))}
+                
+                <h3 className="mt-4 text-sm font-bold truncate group-hover:text-[#FFC509] transition-colors">
+                  {movie.title}
+                </h3>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
-      {selectedMovie && (
-        <QuickViewModal
-          movie={selectedMovie}
-          onClose={() => setSelectedMovie(null)}
-        />
-      )}
+      {/* Modal - Wrapped in AnimatePresence for smooth entry/exit */}
+      <AnimatePresence>
+        {selectedMovie && (
+          <QuickViewModal
+            movie={selectedMovie}
+            onClose={() => setSelectedMovie(null)}
+          />
+        )}
+      </AnimatePresence>
+      
     </div>
+    </motion.div>
   );
 };
 

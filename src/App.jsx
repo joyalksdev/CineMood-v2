@@ -21,9 +21,22 @@ import { Toaster } from "react-hot-toast";
 import MovieRowPage from "./pages/MovieRowPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import GuestRoute from "./routes/GuestRoute"; // Ensure this is imported
+import Lenis from '@studio-freight/lenis'
+import { useEffect } from 'react'
 
 const App = () => {
   const { user, loading } = useUser();
+
+  useEffect(() => {
+    const lenis = new Lenis()
+
+    function raf(time) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+
+    requestAnimationFrame(raf)
+  }, [])
 
   // Prevent flicker during session check
   if (loading) return null;

@@ -33,7 +33,7 @@ const PersonDetails = () => {
 </div>
 
 return (
-  <div className="min-h-screen bg-gradient-to-b rounded-2xl from-neutral-950 via-neutral-900 to-black text-white pb-16 px-6">
+  <div className="min-h-screen pt-24 bg-gradient-to-b rounded-2xl from-neutral-950 via-neutral-900 to-black text-white pb-16 px-6">
      
      <div className='p-2'>
       <GoBackBtn />

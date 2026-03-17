@@ -104,6 +104,7 @@ body {
   ::-webkit-scrollbar-thumb:hover {
     background: #e6b108;
   }
+  
 }
 @layer utilities {
   .mask-fade-bottom {
