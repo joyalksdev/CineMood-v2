@@ -64,7 +64,7 @@ const MoodResults = () => {
   }, [loading, hasMore])
 
   return (
-    <div className="pt-24 px-6 text-white min-h-screen">
+    <div className="px-6 text-white min-h-screen">
       {selectedMovie && (
         <QuickViewModal
           movie={selectedMovie}

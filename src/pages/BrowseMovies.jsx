@@ -63,7 +63,7 @@ const BrowseMovies = () => {
   }, [loading, hasMore])
 
   return (
-    <div className="pt-28 px-6 min-h-screen bg-transparent">
+    <div className="px-6 min-h-screen bg-transparent">
       {selectedMovie && (
         <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
       )}

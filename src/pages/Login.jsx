@@ -2,20 +2,22 @@ import React, { useState } from "react";
 import LoginNavbar from "../components/layout/LoginNavbar";
 import Footer from "../components/layout/Footer";
 import { Link, useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../validations/authSchema";
-import { loginUser } from "../services/authService";
+import { loginUser } from "../services/authService"; // You'll need to add forgotPassword here
 import { useUser } from "../context/UserContext";
-import { getUserProfile } from "../services/profileService";
 import { FadeLoader } from "react-spinners";
 import toast from "react-hot-toast";
+import axios from "axios"; // Using axios directly for the forgot link
+import api from "../services/axios";
 
 const Login = () => {
   const navigate = useNavigate();
   const { saveUser } = useUser();
   const [loading, setLoading] = useState(false);
+  const [isForgotMode, setIsForgotMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   const {
     register,
@@ -23,116 +25,141 @@ const Login = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(loginSchema) });
 
+  // 1. Existing Login Logic
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-
       const res = await loginUser(data.email, data.password);
-
       if (res.success) {
-    
-        const userData = {
-          ...res.user,
-        };
-
-        saveUser(userData);
-
+        saveUser({ ...res.user });
         toast.success("Welcome back! 🎬");
-
-        if (res.user.onboarded) {
-          navigate("/home");
-        } else {
-          navigate("/get-started");
-        }
+        res.user.onboarded ? navigate("/home") : navigate("/get-started");
       }
     } catch (err) {
-      const message =
-        err.response?.data?.message || "Login failed. Please try again.";
-      toast.error(message);
+      toast.error(err.response?.data?.message || "Login failed.");
     } finally {
       setLoading(false);
     }
   };
+
+  // 2. New Forgot Password Logic
+const handleForgotPassword = async (e) => {
+  e.preventDefault();
+  if (!resetEmail) return toast.error("Please enter your email");
+
+  try {
+    setLoading(true);
+    const { data } = await api.post('/auth/forgotpassword', { 
+      email: resetEmail 
+    });
+
+    if (data.success) {
+      toast.success("Reset link sent! Check your inbox. 📧");
+      setIsForgotMode(false);
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.message || "User not found or server error.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
       <LoginNavbar showGetStarted={false} />
       <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10">
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-10">
-            <FadeLoader
-              className="mx-auto mb-5"
-              color="#FFC509"
-              radius={-5}
-              speedMultiplier={1}
-              width={4}
-              loading
-            />
-            <p className="text-neutral-400 text-sm">Signing you in...</p>
+          <div className="flex flex-col items-center justify-center p-10 animate-pulse">
+            <FadeLoader color="#FFC509" />
+            <p className="text-neutral-400 text-sm mt-5 tracking-widest font-bold">
+              {isForgotMode ? "Sending Link..." : "Signing you in..."}
+            </p>
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="w-full max-w-sm sm:max-w-md border rounded-2xl border-neutral-500 bg-[#1b1b1b] p-6 sm:p-10 flex flex-col items-center"
-          >
-            <div className="mb-5 flex flex-col gap-3 ">
-              <h2 className="text-center text-xl sm:text-xl md:text-2xl max-w-xs font-bold heading">
-                Welcome back to <br /> CineMood 🎬
+          <div className="w-full max-w-sm sm:max-w-md border rounded-[2rem] border-neutral-800 bg-[#0d0d0d] p-8 sm:p-10 flex flex-col items-center shadow-2xl transition-all duration-500">
+            
+            {/* Dynamic Header */}
+            <div className="mb-8 text-center">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tighter text-white">
+                {isForgotMode ? "Recover Account" : "Welcome Back"}
               </h2>
-              <p className="text-neutral-300 font-medium">
-                Continue your movie journey
+              <p className="text-neutral-500 text-sm mt-2">
+                {isForgotMode ? "Enter email to receive a magic link" : "Continue your movie journey"}
               </p>
             </div>
 
-            <div className="flex flex-col w-full max-w-70 gap-2 ">
-              <input
-                {...register("email")}
-                className="px-3 border border-neutral-700 py-2  rounded-lg outline-none focus:border-[#FFC509]"
-                placeholder="Email"
-              />
-              <p className="text-red-400 text-sm">{errors.email?.message}</p>
-
-              <input
-                type="password"
-                {...register("password")}
-                className="px-3 border border-neutral-700 py-2 rounded-lg outline-none focus:border-[#FFC509]"
-                placeholder="Password"
-              />
-
-              <span className="text-left w-full text-neutral-300 hover:text-white transition hover:underline">
-                <Link to="/forgot">Forgot password?</Link>
-              </span>
-              <p className="text-red-400 text-sm">{errors.password?.message}</p>
-
-              <div className="flex items-center gap-1">
-                <input type="checkbox" id="" />
-                <label htmlFor="remember">Remember me</label>
+            {isForgotMode ? (
+              /* Forgot Password Form */
+              <div className="w-full flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="px-4 border border-neutral-800 bg-neutral-900/50 py-3 rounded-xl outline-none focus:border-[#FFC509] text-white transition-all"
+                  placeholder="name@example.com"
+                />
+                <button 
+                  onClick={handleForgotPassword}
+                  className="bg-[#FFC509] py-3 text-black font-bold rounded-xl hover:scale-[1.02] transition active:scale-95"
+                >
+                  Send Reset Link
+                </button>
+                <button 
+                  onClick={() => setIsForgotMode(false)}
+                  className="text-neutral-500 text-xs hover:text-white transition uppercase tracking-widest font-bold"
+                >
+                  Back to Login
+                </button>
               </div>
-              <button className="bg-[#FFC509] px-3 py-2 text-black rounded-lg hover:bg-amber-300 cursor-pointer transition ease-in">
-                Login
-              </button>
-            </div>
-            <p className="mt-3">
-              New to CineMood?{" "}
-              <Link to="/register" className="underline hover:no-underline">
-                Register
-              </Link>
-            </p>
+            ) : (
+              /* Standard Login Form */
+              <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="flex flex-col gap-1">
+                  <input
+                    {...register("email")}
+                    className="px-4 border border-neutral-800 bg-neutral-900/50 py-3 rounded-xl outline-none focus:border-[#FFC509] text-white transition-all"
+                    placeholder="Email"
+                  />
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2">{errors.email?.message}</p>
+                </div>
 
-            {/* <span className="relative  border border-neutral-500 w-full max-w-70 mt-7"></span>
-            <p className="relative -top-3.5 px-2 bg-[#1b1b1b]">or</p>
-          
-            <div className="mt-3">
-              <button
-                onClick={handleGoogle}
-                className="py-2 px-5 flex items-center gap-2 border cursor-pointer hover:bg-neutral-800/70 transition ease-in border-neutral-500 rounded-lg  w-full bg-neutral-800"
-              >
-                <FcGoogle size={23} />
-                Continue with Google
-              </button>
-            </div> 
-             */}
-          </form>
+                <div className="flex flex-col gap-1">
+                  <input
+                    type="password"
+                    {...register("password")}
+                    className="px-4 border border-neutral-800 bg-neutral-900/50 py-3 rounded-xl outline-none focus:border-[#FFC509] text-white transition-all"
+                    placeholder="Password"
+                  />
+                  <div className="flex justify-between items-center mt-1 px-1">
+                     <button 
+                       type="button"
+                       onClick={() => setIsForgotMode(true)}
+                       className="text-[11px] text-neutral-500 hover:text-[#FFC509] transition hover:underline"
+                     >
+                       Forgot password?
+                     </button>
+                  </div>
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2">{errors.password?.message}</p>
+                </div>
+
+                <div className="flex items-center gap-2 mb-2 ml-1">
+                  <input type="checkbox" id="remember" className="accent-[#FFC509] rounded" />
+                  <label htmlFor="remember" className="text-xs text-neutral-400 select-none">Remember me</label>
+                </div>
+
+                <button className="bg-[#FFC509] py-3 text-black font-bold rounded-xl hover:scale-[1.02] transition active:scale-95">
+                  Login
+                </button>
+
+                <p className="text-center text-sm text-neutral-500 mt-4">
+                  New to CineMood?{" "}
+                  <Link to="/register" className="text-white hover:text-[#FFC509] underline transition">
+                    Register
+                  </Link>
+                </p>
+              </form>
+            )}
+          </div>
         )}
       </main>
       <Footer />

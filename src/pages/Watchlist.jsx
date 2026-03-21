@@ -26,7 +26,7 @@ const Watchlist = () => {
   transition={{ duration: 0.8, ease: "easeOut" }}
 >
   {/* Page Content */}
-    <div className="px-8 pt-20 py-6 min-h-screen bg-transparent text-white">
+    <div className="px-8 pb-6 min-h-screen bg-transparent text-white">
       <GoBackBtn />
       
       <header className="mb-12">

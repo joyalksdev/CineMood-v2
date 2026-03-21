@@ -23,6 +23,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import GuestRoute from "./routes/GuestRoute"; // Ensure this is imported
 import Lenis from '@studio-freight/lenis'
 import { useEffect } from 'react'
+import VibeSearch from "./pages/VibeSearch";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   const { user, loading } = useUser();
@@ -44,7 +46,7 @@ const App = () => {
   return (
     <>
      <Toaster
-      position="bottom-right"
+      position="top-center"
       toastOptions={{
         // Apply the Glassmorphism style here
         style: {
@@ -119,6 +121,8 @@ const App = () => {
           }
         />
 
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
         {/* 3. ONBOARDING: Protected specifically for new logged-in users */}
         <Route
           path="/get-started"
@@ -138,6 +142,7 @@ const App = () => {
           }
         >
           <Route path="/home" element={<Home />} />
+          <Route path="/ai" element={<VibeSearch />} />
           <Route path="/browse" element={<BrowseMovies />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/movie/:id" element={<MovieDetails />} />

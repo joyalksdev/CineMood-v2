@@ -2,21 +2,19 @@ import React, { useState } from "react";
 import LoginNavbar from "../components/layout/LoginNavbar";
 import Footer from "../components/layout/Footer";
 import { Link, useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerSchema } from "../validations/authSchema";
 import { registerUser } from "../services/authService";
 import { useUser } from "../context/UserContext";
-import { saveUserProfile } from "../services/profileService";
 import { FadeLoader } from "react-spinners";
+import { Mail, Lock, UserPlus } from "lucide-react"; // Matching your modern icon style
 import toast from "react-hot-toast";
 
 const Register = () => {
   const navigate = useNavigate();
   const { saveUser } = useUser();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); 
 
   const {
     register,
@@ -29,7 +27,6 @@ const Register = () => {
   const onSubmit = async (data) => {
     if (loading) return;
     setLoading(true);
-    setError("");
 
     try {
       const response = await registerUser({
@@ -38,15 +35,12 @@ const Register = () => {
       });
 
       if (response.success) {
-        // Save ONLY user info to context
         saveUser(response.user);
-
-        toast.success("Welcome to CineMood!");
+        toast.success("Welcome to CineMood! 🍿");
         navigate("/get-started");
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Registration failed";
-      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -56,89 +50,102 @@ const Register = () => {
   return (
     <>
       <LoginNavbar showGetStarted={false} />
-      <main className="min-h-screen flex justify-center items-center px-6 my-13">
+      <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10">
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-10 w-full max-w-sm">
-            <FadeLoader
-              className="mx-auto mb-5"
-              color="#FFC509"
-              radius={-5}
-              speedMultiplier={1}
-              width={4}
-              loading
-            />
-            <p className="text-neutral-400 text-sm">
-              Creating your CineMood account...
+          <div className="flex flex-col items-center justify-center p-10">
+            <FadeLoader color="#FFC509" />
+            <p className="text-neutral-400 text-sm mt-5 tracking-widest uppercase font-bold">
+              Creating your account...
             </p>
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="w-full max-w-sm sm:max-w-md border rounded-2xl border-neutral-500 bg-[#1b1b1b] p-6 sm:p-10 flex flex-col items-center"
-          >
-            <div className="mb-5 flex flex-col gap-3 ">
-              <h2 className="text-center text-xl sm:text-xl md:text-2xl max-w-xs font-bold heading">
-                Create your CineMood account
+          <div className="w-full max-w-sm sm:max-w-md border rounded-[2.5rem] border-neutral-800 bg-[#0d0d0d] p-8 sm:p-10 flex flex-col items-center shadow-2xl animate-in fade-in zoom-in duration-500">
+            
+            {/* Header Section */}
+            <div className="mb-8 text-center">
+              <div className="inline-flex p-3 rounded-full bg-[#FFC509]/10 text-[#FFC509] mb-4">
+                <UserPlus size={28} />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tighter text-white">
+                Join <span className="text-[#FFC509]">CineMood</span>
               </h2>
-              <p className="text-[#aaaaaa] font-medium text-sm text-center">
-                Step into your movie journey
+              <p className="text-neutral-500 text-sm mt-2">
+                Start your personalized movie journey
               </p>
             </div>
 
-            <div className="flex flex-col w-full max-w-70 gap-2 ">
-              <p className="text-red-400 text-sm">{errors.username?.message}</p>
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-4">
+              
+              {/* Email Input */}
+              <div className="flex flex-col gap-1">
+                <div className="relative group">
+                  <Mail size={18} className="absolute left-4 top-4 text-neutral-600 group-focus-within:text-[#FFC509] transition-colors" />
+                  <input
+                    {...register("email")}
+                    className="w-full px-12 border border-neutral-800 bg-neutral-900/50 py-3.5 rounded-2xl outline-none focus:border-[#FFC509]/40 text-white transition-all placeholder:text-neutral-700"
+                    placeholder="Email Address"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
 
-              <input
-                type="email"
-                {...register("email")}
-                className="px-3 border border-neutral-700 py-2 rounded-lg outline-none focus:border-[#FFC509]"
-                placeholder="Email"
-              />
+              {/* Password Input */}
+              <div className="flex flex-col gap-1">
+                <div className="relative group">
+                  <Lock size={18} className="absolute left-4 top-4 text-neutral-600 group-focus-within:text-[#FFC509] transition-colors" />
+                  <input
+                    type="password"
+                    {...register("password")}
+                    className="w-full px-12 border border-neutral-800 bg-neutral-900/50 py-3.5 rounded-2xl outline-none focus:border-[#FFC509]/40 text-white transition-all placeholder:text-neutral-700"
+                    placeholder="Create Password"
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
 
-              <input
-                type="password"
-                {...register("password")}
-                className="px-3 border border-neutral-700 py-2 rounded-lg outline-none focus:border-[#FFC509]"
-                placeholder="Password"
-              />
-              <p className="text-red-400 text-sm">{errors.password?.message}</p>
-
-              <input
-                type="password"
-                {...register("confirmPassword")}
-                className="px-3 border border-neutral-700 py-2 rounded-lg outline-none focus:border-[#FFC509]"
-                placeholder="Confrim Password"
-              />
-              <p className="text-red-400 text-sm">
-                {errors.confirmPassword?.message}
-              </p>
+              {/* Confirm Password Input */}
+              <div className="flex flex-col gap-1">
+                <div className="relative group">
+                  <Lock size={18} className="absolute left-4 top-4 text-neutral-600 group-focus-within:text-[#FFC509] transition-colors" />
+                  <input
+                    type="password"
+                    {...register("confirmPassword")}
+                    className="w-full px-12 border border-neutral-800 bg-neutral-900/50 py-3.5 rounded-2xl outline-none focus:border-[#FFC509]/40 text-white transition-all placeholder:text-neutral-700"
+                    placeholder="Confirm Password"
+                  />
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
 
               <button
                 disabled={loading}
-                className={`bg-[#FFC509] mt-3 px-3 py-2 font-semibold rounded-lg text-black
-                    ${loading ? "opacity-60 cursor-not-allowed" : "hover:bg-amber-300"}`}
+                className="bg-[#FFC509] mt-2 py-4 text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:scale-[1.02] transition active:scale-95 disabled:opacity-50"
               >
-                {loading ? "Creating account..." : "Register"}
+                Create Account
               </button>
-            </div>
-            <p className="mt-3">
-              Already have an account?{" "}
-              <Link to="/login" className="underline hover:no-underline">
-                Login
-              </Link>
-            </p>
-              {/* Commented Google login */}
-            {/*  <span className='relative  border border-neutral-500 w-full mt-7'></span>
-                  <p className='relative -top-3.5 px-2 bg-[#1b1b1b]'>or</p>
 
-                 <div className='mt-3'>
-                  <button onClick={handleGoogle}
-                    disabled={loading}
-                    className={`py-2 px-5 flex items-center gap-2  cursor-pointer transition ease-in rounded-lg w-full bg-neutral-800
-                    ${loading ? "opacity-60 cursor-not-allowed" : "hover:bg-neutral-700"}`}>
-                    <FcGoogle size={23} />Continue with Google</button>
-                </div> */}
-          </form>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-neutral-500">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-white hover:text-[#FFC509] underline transition-colors">
+                    Login
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
         )}
       </main>
       <Footer />

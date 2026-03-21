@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import SupportModal from '../modals/SupportModal'
 
 const RootLayout = () => {
   return (
@@ -11,8 +12,9 @@ const RootLayout = () => {
         <Navbar />
         
         {/* Main content area */}
-        <main className='flex-grow px-0 lg:px-10'>
+        <main className='flex-grow px-0 lg:px-10 pt-26'>
           <Outlet />
+          <SupportModal />
         </main>
         
         <Footer />

@@ -11,12 +11,13 @@ import {
   fetchPopularKDramas  
 } from '../services/tmbdApi'
 import MoodMatcher from '../components/sections/MoodMatcher'
+import PersonaMatch from '../components/sections/PersonaMatch'
 
 const Home = () => {
   const { user } = useUser()
 
   return (
-    <div className='px-6 lg:px-10 pb-20 pt-24'>
+    <div className='px-6 lg:px-10 pb-20'>
       {/* 1. Cinematic Greeting Section */}
       <div className='flex flex-col justify-center items-center py-16 gap-2'>
         <h2 className='text-4xl md:text-5xl font-extrabold tracking-tight text-center'>
@@ -33,6 +34,8 @@ const Home = () => {
         <RecommendationCard />
         
         <MovieRow rowId="trending" title="🔥 Trending Now" fetchFn={fetchTrendingMovies} /> 
+
+        <PersonaMatch />
         
         <MoodMatcher />
         

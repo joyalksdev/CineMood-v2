@@ -42,7 +42,7 @@ const MovieReviews = () => {
     return <p className="text-white text-center mt-20">Loading movie...</p>;
 
   return (
-    <div className="min-h-screen pt-24 bg-gradient-to-b from-neutral-950 via-neutral-900 to-black rounded-2xl text-white pb-16 pt-2 px-6">
+    <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-900 to-black rounded-2xl text-white pb-16 pt-2 px-6">
       <GoBackBtn />
 
       <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10">

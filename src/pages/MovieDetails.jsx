@@ -84,7 +84,7 @@ const MovieDetails = () => {
     ) || [];
 
   return (
-    <div className="px-8 pb-6 pt-24">
+    <div className="px-8 pb-6">
       <GoBackBtn />
 
       <div className="flex flex-col lg:flex-row gap-8">
