@@ -68,7 +68,7 @@ const VibeSearch = ({ onSelectMovie }) => {
   return (
     <div className="min-h-screen bg-transparent text-white px-4 md:px-6 pt-12 pb-20 relative">
       
-      {/* Toast Notification */}
+   
       {toast && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] bg-neutral-900 border border-white/10 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
           <div className="w-2 h-2 rounded-full bg-[#FFC509] animate-pulse" />
@@ -78,7 +78,7 @@ const VibeSearch = ({ onSelectMovie }) => {
 
       <div className="max-w-3xl mx-auto text-center mb-12">
         
-        {/* AI Engine Badge */}
+    
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] mb-6 animate-fade-in">
           <Sparkles size={14} className="animate-pulse" />
           CineMood AI Nueral Engine v1.0
@@ -94,7 +94,7 @@ const VibeSearch = ({ onSelectMovie }) => {
           </p>
         </div>
 
-        {/* Search Input */}
+     
         <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto group">
           <div className="relative flex items-center bg-neutral-900/40 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl focus-within:border-[#FFC509]/40 transition-all shadow-2xl">
             <div className="pl-5 text-white/20 group-focus-within:text-[#FFC509] transition-colors">
@@ -128,7 +128,6 @@ const VibeSearch = ({ onSelectMovie }) => {
           </div>
         </form>
 
-        {/* SCANNING STATE: AI Processing Feedback */}
         {isLoading && (
           <div className="mt-8 flex flex-col items-center animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/[0.02] border border-white/5">
@@ -143,7 +142,6 @@ const VibeSearch = ({ onSelectMovie }) => {
           </div>
         )}
 
-        {/* AI Insight / Reason Box */}
         {reason && !isLoading && (
           <div className="mt-8 p-6 bg-white/[0.03] border-l-2 border-[#FFC509]/50 text-left rounded-r-2xl animate-in fade-in slide-in-from-left-4">
              <div className="flex items-center gap-2 mb-2 text-[#FFC509]">
@@ -154,7 +152,6 @@ const VibeSearch = ({ onSelectMovie }) => {
           </div>
         )}
 
-        {/* ERROR CARD: Limit Reached */}
         {error === "limit" && (
           <div className="mt-8 p-8 border border-red-500/20 bg-red-500/5 rounded-[2rem] text-center animate-in zoom-in-95 duration-500">
             <AlertCircle className="mx-auto text-red-500 mb-4" size={32} />
@@ -172,7 +169,6 @@ const VibeSearch = ({ onSelectMovie }) => {
         )}
       </div>
 
-      {/* Results Grid with Staggered Animation */}
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {results.map((movie, index) => (
           <div

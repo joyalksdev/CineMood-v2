@@ -13,6 +13,13 @@ const linkStyle = ({isActive}) =>
       : "text-neutral-300 hover:text-white border hover:border-yellow-400/50 hover:bg-white/10"
   }`;
 
+  const aiLinkStyle = ({isActive}) => 
+  `px-4 py-1.5 rounded-full transition-all duration-200 text-sm font-medium flex items-center gap-2 ${
+    isActive 
+      ? "bg-[#FFC509]/20 text-[#FFC509] border border-[#FFC509]/50 shadow-[0_0_15px_rgba(255,197,9,0.3)]" 
+      : "text-neutral-300 border border-purple-500/30 hover:border-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
+  }`;
+
   
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -20,7 +27,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-b from-black/90 to-transparent backdrop-blur-md px-6 py-5 flex items-center justify-between text-white">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-b from-black/90 to-transparent backdrop-blur-md px-10 py-5 flex items-center justify-between text-white">
 
         <Link to="/home" className="flex items-center gap-3 text-[25px] heading">
           <img src={logo} alt="Logo" className="h-8" />
@@ -35,6 +42,7 @@ const Navbar = () => {
             <NavLink to='/home' className={linkStyle} >Home</NavLink>
             <NavLink to='browse' className={linkStyle} >Browse</NavLink>
             <NavLink to='watchlist' className={linkStyle} >Watchlist</NavLink>
+            <NavLink to='ai' className={aiLinkStyle}>VibeSearch</NavLink>
           </ul>
         )}
 
@@ -67,6 +75,7 @@ const Navbar = () => {
             <NavLink to='/home' onClick={() => setIsMenuOpen(false)} className={linkStyle} >Home</NavLink>
             <NavLink to='browse' onClick={() => setIsMenuOpen(false)} className={linkStyle} >Browse</NavLink>
             <NavLink to='watchlist' onClick={() => setIsMenuOpen(false)} className={linkStyle} >Watchlist</NavLink>
+            <NavLink to='ai' onClick={() => setIsMenuOpen(false)} className={aiLinkStyle}>VibeSearch ✨</NavLink>
 
       </div>
     </>
