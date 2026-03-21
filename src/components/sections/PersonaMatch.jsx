@@ -45,7 +45,7 @@ const PersonaMatch = ({ onSelectMovie }) => {
     setIsSyncing(true);
     setMatch(null);
     try {
-      const { data: watchlistData } = await axios.get('http://localhost:4000/api/watchlist/titles', {
+      const { data: watchlistData } = await axios.get('https://cinemood-api.onrender.com/api/watchlist/titles', {
         withCredentials: true 
       });
 
