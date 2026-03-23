@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Sparkles, Loader2, X, Search, Star, MessageSquare, Cpu, Database, Fingerprint, AlertCircle } from 'lucide-react';
 import { getAiRecommendations } from "../services/aiService";
 import moviePlaceholder from "../assets/m-placeholder.png";
+import QuickViewModal from "../components/modals/QuickViewModal";
 
 const VibeSearch = ({ onSelectMovie }) => {
   const [query, setQuery] = useState("");
@@ -11,6 +12,7 @@ const VibeSearch = ({ onSelectMovie }) => {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [selectedMovie, setSelectedMovie] = useState(null);
   
   // Ref for AbortController to cancel API calls
   const abortControllerRef = useRef(null);
@@ -210,7 +212,7 @@ const VibeSearch = ({ onSelectMovie }) => {
         {results.map((movie, index) => (
           <div
             key={movie.id}
-            onClick={() => onSelectMovie(movie)}
+          onClick={() => setSelectedMovie(movie)}
             className="group cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
             style={{ animationDelay: `${index * 70}ms` }}
           >
@@ -234,6 +236,12 @@ const VibeSearch = ({ onSelectMovie }) => {
           </div>
         ))}
       </div>
+      {selectedMovie && (
+        <QuickViewModal 
+          movie={selectedMovie} 
+          onClose={() => setSelectedMovie(null)} 
+        />
+      )}
     </div>
   );
 };
