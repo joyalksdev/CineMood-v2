@@ -79,9 +79,9 @@ const VibeSearch = ({ onSelectMovie }) => {
       <div className="max-w-3xl mx-auto text-center mb-12">
         
     
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] mb-6 animate-fade-in">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-green-400 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] mb-6 animate-fade-in">
           <Sparkles size={14} className="animate-pulse" />
-          CineMood AI Nueral Engine v1.0
+          CineMood Neural Engine v2.5
         </div>
 
         <div className="max-w-3xl mx-auto text-center mb-10">

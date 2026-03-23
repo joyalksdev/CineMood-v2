@@ -25,6 +25,7 @@ import Lenis from '@studio-freight/lenis'
 import { useEffect } from 'react'
 import VibeSearch from "./pages/VibeSearch";
 import ResetPassword from "./pages/ResetPassword";
+import WeeklySpotlight from "./components/sections/WeeklySpotlight";
 
 const App = () => {
   const { user, loading } = useUser();
@@ -143,6 +144,7 @@ const App = () => {
         >
           <Route path="/home" element={<Home />} />
           <Route path="/ai" element={<VibeSearch />} />
+          <Route path="/weekly-spotlight" element={<WeeklySpotlight />} />
           <Route path="/browse" element={<BrowseMovies />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/movie/:id" element={<MovieDetails />} />

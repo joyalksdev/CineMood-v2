@@ -11,7 +11,7 @@ import {
   fetchPopularKDramas  
 } from '../services/tmbdApi'
 import MoodMatcher from '../components/sections/MoodMatcher'
-import PersonaMatch from '../components/sections/PersonaMatch'
+import WeeklySpotlight from '../components/sections/WeeklySpotlight' 
 
 const Home = () => {
   const { user } = useUser()
@@ -35,7 +35,7 @@ const Home = () => {
         
         <MovieRow rowId="trending" title="🔥 Trending Now" fetchFn={fetchTrendingMovies} /> 
 
-        <PersonaMatch />
+        <WeeklySpotlight />
         
         <MoodMatcher />
         
