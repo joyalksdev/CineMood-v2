@@ -1,10 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import logo from '../../assets/logo.png'
 import { Link, NavLink } from 'react-router-dom'
 import { HiOutlineSearch, HiOutlineMenuAlt3, HiX } from "react-icons/hi"
 import DropDownProfile from '../ui/DropDownProfile'
 import { useUser } from '../../context/UserContext'
 import SearchBar from '../search/SearchBar'
+import { Bell } from "lucide-react";
+import { useNotifications } from '../../hooks/useNotifications'
+import NotificationDrawer from '../notification/NotificationDrawer' 
+import NotificationTrigger from '../notification/NotificationTrigger'
+import api from '../../services/axios'
+import toast from 'react-hot-toast'
 
 const linkStyle = ({isActive}) => 
   `px-4 py-1.5 rounded-full transition-all border border-transparent duration-200 text-sm font-medium ${
@@ -22,8 +28,46 @@ const linkStyle = ({isActive}) =>
 
   
 const Navbar = () => {
+  const {user} = useUser()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { notifications, unreadCount, refresh, loading } = useNotifications()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+ const handleMarkRead = async (id) => {
+    try {
+      await api.put(`/profile/notifications/${id}/read`);
+      refresh(); // Syncs immediately without page reload
+    } catch (err) {
+      console.error("Failed to mark read");
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await api.put("/profile/notifications/read-all");
+      refresh(); // Syncs immediately without page reload
+    } catch (err) {
+      console.error("Failed to sync all");
+    }
+  };
+
+useEffect(() => {
+  if (notifications.length > 0) {
+    const latest = notifications[0];
+
+    // Only toast if it's unread AND arrived in the last 15 seconds
+    const isNew = new Date(latest.createdAt) > new Date(Date.now() - 15000);
+
+    if (!latest.isRead && isNew) {
+      toast(latest.title, {
+        icon: '🔔',
+        // This will automatically use the styles you defined in App.jsx
+        duration: 4000,
+      });
+    }
+  }
+}, [notifications.length]); // Triggers only when a new notification is added to the list
 
   return (
     <>
@@ -62,11 +106,28 @@ const Navbar = () => {
             {isMenuOpen ? <HiX /> : <HiOutlineMenuAlt3 />}
             </button>
 
+            {user && (
+              <NotificationTrigger 
+                unreadCount={unreadCount} 
+                onClick={() => setIsDrawerOpen(true)} 
+              />
+            )}
+
             <DropDownProfile />
           </div>
         )}
       </nav>
-      
+
+      <NotificationDrawer 
+        isOpen={isDrawerOpen} 
+        onClose={() => setIsDrawerOpen(false)} 
+        notifications={notifications}
+        onMarkRead={handleMarkRead} 
+        onMarkAllRead={handleMarkAllRead}
+        onRefresh={refresh} // Pass the refresh function
+        loading={loading}   // Pass loading state for the spin animation
+      />
+            
 
 
       <div className={`fixed inset-0 z-40 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 text-xl transition-all duration-300

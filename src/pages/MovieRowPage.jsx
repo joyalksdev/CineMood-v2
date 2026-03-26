@@ -10,6 +10,9 @@ import {
 } from "../services/tmbdApi"
 import MovieGridCard from "../components/cards/MovieGridCard"
 import { FadeLoader } from "react-spinners"
+import { Search, ArrowLeft } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import GoBackBtn from "../components/ui/GoBackBtn"
 
 const API_MAP = {
   now_playing: fetchNowPlayingMovies,
@@ -21,12 +24,12 @@ const API_MAP = {
 }
 
 const ROW_TITLES = {
-  now_playing: "🎬 Now Playing Movies",
-  top_rated: "⭐ Top Rated Movies",
-  trending: "🔥 Trending Movies",
-  popular_movies: "🎥 Popular Movies",
-  popular_kdrama: "🇰🇷 Popular K-Dramas",
-  popular_anime: "🍥 Popular Anime"
+  now_playing: "Now Playing Movies",
+  top_rated: "Top Rated Movies",
+  trending: "Trending Movies",
+  popular_movies: "Popular Movies",
+  popular_kdrama: "Popular K-Dramas",
+  popular_anime: "Popular Anime"
 }
 
 const MovieRowPage = () => {
@@ -47,30 +50,63 @@ const MovieRowPage = () => {
   }, [type])
 
   const filtered = movies.filter(m =>
-    m.title?.toLowerCase().includes(search.toLowerCase())
+    (m.title || m.name)?.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
-    <div className="px-6 py-6">
-      <h2 className="text-3xl font-bold mb-4">
-        {ROW_TITLES[type]}
-      </h2>
+    <div className="min-h-screen px-6 md:px-12 py-10">
+      
+      {/* Back Button & Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="space-y-2">
+         <GoBackBtn/>
+          <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight ">
+            {ROW_TITLES[type] || "Movie Collection"}
+          </h2>
+          <div className="h-1 w-20 bg-[#FFC509] rounded-full shadow-[0_0_15px_#FFC50960]" />
+        </div>
 
-      <input
-        type="text"
-        placeholder="Search in this section..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="w-full md:w-96 mb-6 p-3 rounded bg-neutral-800 outline-none border border-neutral-700"
-      />
-
-      {loading && <FadeLoader color="#FFC509"/>}
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {!loading && filtered.map(movie => (
-          <MovieGridCard key={movie.id} movie={movie} />
-        ))}
+        {/* Neural Search Input */}
+        <div className="relative group w-full md:w-96">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within:text-[#FFC509] transition-colors" size={20} />
+          <input
+            type="text"
+            placeholder="Search within this sector..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-[#FFC509]/50 focus:bg-white/[0.08] transition-all text-white font-medium placeholder:text-neutral-600 shadow-2xl"
+          />
+        </div>
       </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-40 gap-4">
+          <FadeLoader color="#FFC509" />
+          <p className="text-[10px] text-neutral-500 font-black uppercase tracking-[0.5em] animate-pulse">
+            Accessing Database
+          </p>
+        </div>
+      )}
+
+      {/* Results Grid */}
+      {!loading && (
+        <>
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10">
+              {filtered.map(movie => (
+                <MovieGridCard key={movie.id} movie={movie} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-40 border border-dashed border-white/5 rounded-[3rem]">
+              <p className="text-neutral-500 font-bold uppercase tracking-widest">
+                No signals found matching "{search}"
+              </p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

@@ -26,6 +26,13 @@ import { useEffect } from 'react'
 import VibeSearch from "./pages/VibeSearch";
 import ResetPassword from "./pages/ResetPassword";
 import WeeklySpotlight from "./components/sections/WeeklySpotlight";
+import AdminLayout from './components/layout/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminUsersList from './pages/admin/AdminUsersList'
+import AdminReviewList from './pages/admin/AdminReviewList'
+import AdminBroadcast from './pages/admin/AdminBroadcast'
+import AdminRoute from "./routes/AdminRoute";
+import AdminLogs from "./pages/admin/AdminLogs";
 
 const App = () => {
   const { user, loading } = useUser();
@@ -80,16 +87,25 @@ const App = () => {
       }}
     />
       <Routes>
+
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} /> 
+            <Route path="users" element={<AdminUsersList />} /> 
+            <Route path="reviews" element={<AdminReviewList />} />
+            <Route path="broadcast" element={<AdminBroadcast />} />
+            <Route path="logs" element={<AdminLogs />} />
+          </Route>
+        </Route>
+
+
         {/* 1. PUBLIC & SMART REDIRECT: Landing Page */}
         <Route
           path="/"
+          index // Add the index prop here
           element={
             user ? (
-              user.onboarded ? (
-                <Navigate to="/home" replace />
-              ) : (
-                <Navigate to="/get-started" replace />
-              )
+              user.onboarded ? <Navigate to="/home" replace /> : <Navigate to="/get-started" replace />
             ) : (
               <Landing />
             )

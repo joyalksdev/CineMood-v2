@@ -1,150 +1,126 @@
 import React, { useEffect, useRef, useState } from "react";
 import QuickViewModal from "../modals/QuickViewModal";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useWatchlist } from "../../context/WatchlistContext";
+import { ChevronLeft, ChevronRight, Star, Info, ArrowRight } from "lucide-react";
 import WatchlistButton from "../ui/WatchlistButton";
 import moviePlaceholder from "../../assets/m-placeholder.png";
 import CardSkelton from "./CardSkelton";
 import { useNavigate } from "react-router-dom";
 
-
 const MovieRow = ({ rowId, title, fetchFn }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const { addToWatchlist } = useWatchlist();
-  const navigate = useNavigate()
-
-  const rows = [
-  { id: "now_playing", title: "🎬 Now Playing Movies" },
-  { id: "top_rated", title: "⭐ Top Rated Movies" },
-  { id: "trending", title: "🔥 Trending Movies" },
-  { id: "popular_kdrama", title: "🇰🇷 Popular K-Dramas" },
-  { id: "popular_anime", title: "🍥 Popular Anime" },
-  { id: "top_20", title: "🏆 Top 20 Movies" }
-] 
-
-
-  useEffect(() => {
-    setLoading(true);
-    fetchFn().then((data) => {
-      setMovies(data);
-      setLoading(false);
-    });
-  }, [fetchFn]);
-
+  const navigate = useNavigate();
   const rowRef = useRef(null);
 
-  const scroll = (direction) => {
-    const width = rowRef.current.clientWidth;
-    rowRef.current.scrollBy({
-      left: direction === "left" ? -width : width,
-      behavior: "smooth",
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    fetchFn().then((data) => {
+      if (isMounted) {
+        setMovies(data);
+        setLoading(false);
+      }
     });
+    return () => { isMounted = false; };
+  }, [fetchFn]);
+
+  const scroll = (direction) => {
+    if (rowRef.current) {
+      const scrollAmount = rowRef.current.clientWidth * 0.8;
+      rowRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (
-    <section>
+    <section className="py-6 group/section relative overflow-hidden">
       {selectedMovie && (
-        <QuickViewModal
-          movie={selectedMovie}
-          onClose={() => setSelectedMovie(null)}
-        />
+        <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
       )}
 
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="font-bold heading text-xl md:text-2xl">{title}</h2>
-
-          <button
-          onClick={() => navigate(`/movies/${rowId}`)}
-          className="text-[#FFC509] cursor-pointer px-10 text-sm hover:underline"
-        >
-          See All →
+      {/* Header Area */}
+      <div className="flex justify-between items-end mb-4 px-4 md:px-12">
+        <div className="space-y-1">
+          <h2 className="text-xl md:text-2xl font-extrabold text-white tracking-tight group-hover/section:text-[#FFC509] transition-colors duration-300">
+            {title}
+          </h2>
+          <div className="h-1 w-8 bg-green-400 rounded-full" />
+        </div>
+        <button onClick={() => navigate(`/movies/${rowId}`)} className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2 hover:text-green-400 transition-all">
+          Explore <ArrowRight size={14} />
         </button>
-
-        </div>
-
-
-        <div className="hidden lg:flex gap-3">
-          <button
-            onClick={() => scroll("left")}
-            className="group flex items-center justify-center w-10 h-10 
-            rounded-full bg-black/40 backdrop-blur-md hover:bg-[#FFC509] 
-            transition-all duration-200"
-          >
-            <ChevronLeft
-              className="text-white group-hover:text-black"
-              size={26}
-            />
-          </button>
-
-          <button
-            onClick={() => scroll("right")}
-            className="group flex items-center justify-center w-10 h-10 
-            rounded-full bg-black/40 backdrop-blur-md hover:bg-[#FFC509] 
-            transition-all duration-200"
-          >
-            <ChevronRight
-              className="text-white group-hover:text-black"
-              size={26}
-            />
-          </button>
-        </div>
       </div>
 
-      <div
-  ref={rowRef}
-  className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide px-2 md:px-6 py-4"
->
-  {loading &&
-    [...Array(6)].map((_, i) => <CardSkelton key={i} />)}
+      <div className="relative group/carousel px-4 md:px-10">
+        <button onClick={() => scroll("left")} className="absolute left-1 top-[40%] -translate-y-1/2 z-50 w-12 h-12 items-center justify-center rounded-full bg-black/80 backdrop-blur-2xl border border-white/10 opacity-0 group-hover/carousel:opacity-100 transition-all hidden md:flex hover:scale-110 hover:border-green-400/50 hover:text-green-400">
+          <ChevronLeft size={32} />
+        </button>
+        <button onClick={() => scroll("right")} className="absolute right-1 top-[40%] -translate-y-1/2 z-50 w-12 h-12 items-center justify-center rounded-full bg-black/80 backdrop-blur-2xl border border-white/10 opacity-0 group-hover/carousel:opacity-100 transition-all hidden md:flex hover:scale-110 hover:border-green-400/50 hover:text-green-400">
+          <ChevronRight size={32} />
+        </button>
 
-  {!loading && movies.length === 0 && (
-    <p className="text-neutral-400 px-4">No movies found</p>
-  )}
+        <div ref={rowRef} className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory">
+          {loading ? (
+            [...Array(8)].map((_, i) => <CardSkelton key={i} />)
+          ) : (
+            movies.map((movie) => (
+              <div
+                key={movie.id}
+                onClick={() => setSelectedMovie(movie)} // Entire card clickable on Mobile
+                className="relative px-3 min-w-[135px] sm:min-w-[170px] md:min-w-[200px] lg:min-w-[250px] snap-start group/card py-2 cursor-pointer"
+              >
+                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a] border border-white/5 transition-all duration-500 group-hover/card:border-green-400/30 shadow-2xl">
+                  <img
+                    src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
+                    className="w-full h-full object-cover transition-all duration-700 md:group-hover/card:scale-105 md:group-hover/card:brightness-[0.4] opacity-90"
+                    alt={movie.title}
+                  />
 
-  {!loading &&
-    movies.map((movie) => (
-      <div
-        key={movie.id}
-        className="relative min-w-[120px] sm:min-w-[160px] md:min-w-[250px]
-        max-w-[120px] sm:max-w-[160px] md:max-w-[250px]
-        bg-zinc-900 border border-gray-500/40 rounded-xl overflow-hidden
-        hover:scale-105 transition-transform duration-300">
+                  {/* Rating Badge */}
+                  <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[#FFC509] flex items-center gap-1 font-bold text-[9px] z-10 transition-transform md:group-hover/card:scale-110">
+                    <Star size={10} fill="yellow" />
+                    {(movie.rating || movie.vote_average || 0).toFixed(1)}
+                  </div>
 
-              <img
-                src={
-                  movie.poster_path
-                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                    : moviePlaceholder
-                }
-                className="w-full h-[180px] md:h-[320px] object-cover"
-                onClick={() => setSelectedMovie(movie)}
-                alt={movie.title}
-              />
+                  {/* MOBILE ONLY: Watchlist Floating Icon */}
+                  <div className="absolute bottom-2 right-2 md:hidden z-20" onClick={(e) => e.stopPropagation()}>
+                     <div className="p-1 bg-black/60 backdrop-blur-xl border border-white/10 rounded-lg">
+                        <WatchlistButton movie={movie} variant="card" />
+                     </div>
+                  </div>
 
-              <div className="p-4 hidden md:block">
-                <h3 className="text-white text-sm font-semibold truncate">
-                  {movie.title}
-                </h3>
-                <p className="text-xs text-gray-400">
-                 ⭐ {movie.rating ? movie.rating.toFixed(1) : "0.0"}
-                </p>
+                  {/* DESKTOP ONLY: Hover Overlay */}
+                  <div className="hidden md:flex absolute inset-0 flex-col justify-end p-4 opacity-0 group-hover/card:opacity-100 transition-all duration-300 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                    <h3 className="text-white font-bold text-sm mb-3 line-clamp-2 leading-tight transform translate-y-2 group-hover/card:translate-y-0 transition-transform duration-300">
+                      {movie.title}
+                    </h3>
+                    <div className="flex items-center gap-2 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">
+                      <button 
+                        className="flex-1 h-10 bg-white text-black text-[9px] font-bold uppercase tracking-widest rounded-xl hover:bg-[#FFC509] transition-colors flex items-center justify-center gap-2 shadow-lg"
+                      >
+                        <Info size={16} strokeWidth={2.5} /> Info
+                      </button>
+                      <div className="pointer-events-auto flex items-center justify-center min-w-[40px] h-10 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl hover:bg-white/20 transition-all">
+                        <WatchlistButton movie={movie} variant="card" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                <div className="flex justify-between pt-2">
-                  <button
-                    onClick={() => setSelectedMovie(movie)}
-                    className="text-md px-7 py-1 rounded-2xl bg-[#FFC509] cursor-pointer hover:bg-amber-300 font-medium text-black"
-                  >
-                    View Details
-                  </button>
-
-                  <WatchlistButton movie={movie} variant="card" />
+                {/* Title & Info - Visible on all devices below card */}
+                <div className="mt-3 px-1">
+                   <h4 className="text-white text-[12px] font-semibold truncate md:hidden mb-1">{movie.title}</h4>
+                  <p className="text-white/20 text-[9px] font-bold uppercase tracking-widest group-hover/card:text-green-400 transition-colors">
+                    {movie.release_date?.split("-")[0]} • {movie.media_type || "Movie"}
+                  </p>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
+        </div>
       </div>
     </section>
   );

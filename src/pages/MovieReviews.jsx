@@ -1,136 +1,136 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { fetchMovieDetails, fetchMovieReviews } from "../services/tmbdApi";
 import GoBackBtn from "../components/ui/GoBackBtn";
 import ReviewModal from "../components/modals/ReviewModal";
+import FullReviewModal from "../components/modals/FullReviewModal";
 import { useReviews } from "../services/useReviews";
+import { IoStar, IoCreateOutline } from "react-icons/io5";
+import { RiDoubleQuotesL } from "react-icons/ri";
 
 const MovieReviews = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
-  const [openReview, setOpenReview] = useState(false);
+  const [openPostModal, setOpenPostModal] = useState(false);
+  const [selectedFullReview, setSelectedFullReview] = useState(null);
   const [tmdbReviews, setTmdbReviews] = useState([]);
 
   useEffect(() => {
     fetchMovieDetails(id).then(setMovie);
-  }, [id]);
-
-  useEffect(() => {
-    const loadTmdbReviews = async () => {
-      const data = await fetchMovieReviews(id, 1);
-      setTmdbReviews(data.results || []);
-    };
-    loadTmdbReviews();
-  }, [id]);
-
-  useEffect(() => {
+    fetchMovieReviews(id, 1).then(data => setTmdbReviews(data.results || []));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [id]);
 
-  // Load Cinemood reviews using useReviews hook
-  const { reviews: cinemoodReviews, loading } = useReviews(movie?.id);
+  const { reviews: cinemoodReviews } = useReviews(id);
 
-  // Merge reviews: Cinemood reviews first, then TMDB reviews
   const displayReviews = [
     ...cinemoodReviews,
-    ...tmdbReviews.filter(
-      (tmdb) => !cinemoodReviews.find((c) => c.id === tmdb.id),
-    ),
+    ...tmdbReviews.filter(tmdb => !cinemoodReviews.find(c => c.id === tmdb.id))
   ];
 
-  if (!movie)
-    return <p className="text-white text-center mt-20">Loading movie...</p>;
+  if (!movie) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-900 to-black rounded-2xl text-white pb-16 pt-2 px-6">
-      <GoBackBtn />
-
-      <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10">
-        <header className="flex flex-col md:flex-row gap-10 items-center md:items-start">
-          <img
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-            className="w-52 h-72 object-cover rounded-2xl shadow-xl"
-          />
-
-          <div className="flex-1">
-            <h2 className="text-4xl font-bold">{movie.title}</h2>
-            <p className="text-neutral-400 mt-2">
-              ⭐ {movie.vote_average} / 10 • {displayReviews.length} Reviews
-            </p>
-
-            <p className="text-neutral-300 mt-4 max-w-xl leading-relaxed">
-              {movie.overview}
-            </p>
-
-            <button
-              onClick={() => setOpenReview(true)}
-              className="px-4 py-2 mt-2 bg-yellow-400 text-black cursor-pointer font-semibold rounded-lg"
-            >
-              Post Review
-            </button>
-
-            {openReview && (
-              <ReviewModal movie={movie} onClose={() => setOpenReview(false)} />
-            )}
-          </div>
-        </header>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative pb-20">
+      
+      {/* Cinematic Header Background */}
+      <div className="absolute -top-26 left-0 lg:-left-10 w-[100vw] h-[500px] pointer-events-none overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-20 blur-3xl scale-110"
+          style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]" />
       </div>
 
-      <section className="py-10">
-        <h2 className="text-2xl font-bold heading mb-6">⭐ User Reviews</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          {displayReviews.map((r) =>
-          // CINEMOOD REVIEWs
-            r.userName ? (
-              <div
-                key={r._id || r.id} // MongoDB uses _id
-                className="bg-neutral-900 p-4 rounded-xl border border-yellow-400/40"
-              >
-                <div className="flex justify-between items-center text-sm">
-                  <span className="flex items-center gap-2">
-                  
-                    <img
-                      src={
-                        r.userAvatar ||
-                        `https://api.dicebear.com/7.x/micah/svg?seed=${r.userName}`
-                      }
-                      className="w-6 h-6 rounded-full object-cover"
-                      alt="profile"
-                    />
-                    {r.userName} 
-                    <span className="bg-[#FFC509] text-black text-xs px-2 py-0.5 rounded-full">
-                      CineMood User
-                    </span>
-                  </span>
-                  <span className="text-[#FFC509]">⭐ {r.rating}/10</span>
+      <div className="relative z-10">
+        <GoBackBtn />
+
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row gap-8 items-center mt-6 mb-16">
+          <motion.img 
+            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            className="w-44 md:w-52 rounded-2xl shadow-2xl border border-white/5"
+          />
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">{movie.title}</h1>
+            <div className="flex items-center justify-center md:justify-start gap-4 text-sm font-medium text-neutral-400 mb-6">
+              <span className="text-[#FFC509] font-black">★ {movie.vote_average?.toFixed(1)}</span>
+              <span className="w-1 h-1 rounded-full bg-neutral-700" />
+              <span>{displayReviews.length} Reviews</span>
+            </div>
+            <button 
+              onClick={() => setOpenPostModal(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-[#FFC509] hover:bg-white text-black font-bold rounded-xl transition-all active:scale-95"
+            >
+              <IoCreateOutline size={20} /> WRITE REVIEW
+            </button>
+          </div>
+        </header>
+
+        {/* Reviews Grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {displayReviews.map((r, index) => {
+            const isCinemood = !!r.userName;
+            const content = r.content || r.text;
+            const author = r.userName || r.author;
+            const rating = r.rating || r.author_details?.rating || "?";
+
+            return (
+            <motion.div
+              key={r.id || index}
+              onClick={() => setSelectedFullReview(r)}
+              className={`group relative p-6 rounded-3xl cursor-pointer border transition-all duration-500 overflow-hidden ${
+                isCinemood 
+                  ? 'bg-[#FFC509]/[0.03] border-[#FFC509]/20 hover:border-[#FFC509]/50' 
+                  : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+              }`}
+            >
+              {/* Background Quote Icon for the Card */}
+              <RiDoubleQuotesL className="absolute -top-2 -right-2 text-white/[0.03] size-24 pointer-events-none transition-transform group-hover:scale-110" />
+
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-black font-black text-xs ${isCinemood ? 'bg-[#FFC509]' : 'bg-zinc-700 text-white'}`}>
+                      {author[0]}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold truncate max-w-[120px]">{author}</h4>
+                      {isCinemood && <span className="text-[8px] text-[#FFC509] font-black uppercase tracking-widest">CineMood Signal</span>}
+                    </div>
+                  </div>
+                  <span className="text-[#FFC509] font-black text-xs">★ {rating}</span>
                 </div>
-                <p className="mt-2 text-sm text-neutral-200 line-clamp-4">
-                  {r.content} 
+
+                <p className="text-sm text-neutral-400 leading-relaxed line-clamp-4 group-hover:text-neutral-200 transition-colors">
+                  "{content}"
                 </p>
+
+                <button className="mt-4 text-[10px] font-black text-[#FFC509] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                  Expand Review  →
+                </button>
               </div>
-            ) : (
-              // TMDB REVIEWs
-              <div
-                key={r.id}
-                className="bg-neutral-800/70 p-4 rounded-xl border border-white/10"
-              >
-                <div className="flex justify-between items-center text-sm text-neutral-400">
-                  <span>{r.author}</span>
-                  {r.author_details?.rating && (
-                    <span className="text-[#FFC509]">
-                      ⭐ {r.author_details.rating}/10
-                    </span>
-                  )}
-                </div>
-                <p className="mt-2 text-sm text-neutral-300 line-clamp-4">
-                  {r.content}
-                </p>
-              </div>
-            ),
-          )}
+            </motion.div>
+            );
+          })}
         </div>
-      </section>
-    </div>
+      </div>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {openPostModal && (
+          <ReviewModal movie={movie} onClose={() => setOpenPostModal(false)} />
+        )}
+        {selectedFullReview && (
+          <FullReviewModal 
+            review={selectedFullReview} 
+            onClose={() => setSelectedFullReview(null)} 
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

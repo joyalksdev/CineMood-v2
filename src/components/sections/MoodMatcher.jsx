@@ -1,32 +1,33 @@
 import React, { useState } from "react";
 import { FaSmile, FaSadTear, FaFire, FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight, LayoutGrid } from "lucide-react";
 
 const moods = [
   {
     label: "Happy",
-    icon: <FaSmile />,
-    color: "bg-yellow-400/20 text-yellow-300",
+    icon: <FaSmile size={20} />,
+    activeClass: "border-yellow-500 bg-yellow-500/10 text-yellow-400 shadow-[0_0_20px_rgba(255,197,9,0.15)]",
     genres: [35, 16],
-  }, // Comedy, Animation
+  },
   {
     label: "Romantic",
-    icon: <FaHeart />,
-    color: "bg-pink-400/20 text-pink-300",
+    icon: <FaHeart size={20} />,
+    activeClass: "border-rose-500 bg-rose-500/10 text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.15)]",
     genres: [10749, 18],
-  }, // Romance, Drama
+  },
   {
     label: "Thrilling",
-    icon: <FaFire />,
-    color: "bg-red-400/20 text-red-300",
+    icon: <FaFire size={20} />,
+    activeClass: "border-red-500 bg-red-500/10 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.15)]",
     genres: [28, 53],
-  }, // Action, Thriller
+  },
   {
     label: "Sad",
-    icon: <FaSadTear />,
-    color: "bg-blue-400/20 text-blue-300",
+    icon: <FaSadTear size={20} />,
+    activeClass: "border-blue-500 bg-blue-500/10 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.15)]",
     genres: [18],
-  }, // Drama
+  },
 ];
 
 const MoodMatcher = () => {
@@ -34,81 +35,83 @@ const MoodMatcher = () => {
   const [typedMood, setTypedMood] = useState("");
   const navigate = useNavigate();
 
+  const handleSearch = () => {
+    if (activeMood) {
+      navigate(`/mood/${activeMood.label.toLowerCase()}`, {
+        state: { genres: activeMood.genres, mood: activeMood.label },
+      });
+    } else if (typedMood.trim()) {
+      navigate(`/mood/custom`, {
+        state: { mood: typedMood },
+      });
+    }
+  };
+
   return (
-    <section
-      className="relative py-14 md:py-20 flex flex-col items-center rounded-2xl text-center
-      bg-gradient-to-br from-black via-zinc-900 to-black">
-  
-      <div className="pointer-events-none absolute w-[420px] h-[420px] bg-green-500/20 blur-[140px] rounded-full -top-32 -left-32" />
-      <div className="pointer-events-none absolute w-[420px] h-[420px] bg-yellow-500/10 blur-[140px] rounded-full bottom-0 right-0" />
+    <section className="relative w-full py-12 md:py-16 flex flex-col items-center justify-center rounded-[2.5rem] text-center bg-[#070707] border border-white/5 overflow-hidden px-6">
+      
+      {/* Subtle Branding Glow */}
+      <div className="pointer-events-none absolute w-[400px] h-[400px] bg-[#FFC509]/5 blur-[120px] rounded-full -top-40 -left-20" />
 
-      <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold heading px-4">
-        How Are You Feeling Today?
-      </h2>
-
-      <p className="text-sm md:text-base text-neutral-400 px-6 mt-3 max-w-xl">
-        Choose your mood and let us recommend movies that perfectly match your
-        emotions.
-      </p>
-
-      <div className="relative z-10 flex flex-wrap justify-center gap-3 mt-6 px-4">
-        {moods.map((mood, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              setActiveMood(mood);
-              setTypedMood("");
-            }}
-            className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-full border border-white/10
-        backdrop-blur-md ${
-          mood.color
-        } hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-yellow-400
-        ${
-          activeMood?.label === mood.label
-            ? "ring-2 ring-yellow-400 scale-105"
-            : ""
-        }`}
-          >
-            {mood.icon}
-            <span className="font-medium text-sm sm:text-base">
-              {mood.label}
-            </span>
-          </button>
-        ))}
+      {/* Tagline: Clear and Functional */}
+      <div className="relative z-10 flex items-center gap-2 px-3 py-1 mb-6 rounded-md bg-white/[0.03] border border-white/5">
+        <LayoutGrid size={12} className="text-[#FFC509]" />
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-500">Instant Filter</span>
       </div>
 
+      <h2 className="relative z-10 text-2xl md:text-4xl font-black text-white tracking-wide px-4  leading-none">
+        Pick Your <span className="text-[#FFC509]">Mood</span>
+      </h2>
 
-      <div className="relative z-10 mt-6 w-full max-w-md px-4">
+      {/* Mood Grid: Tactile & Interactive */}
+      <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 w-full max-w-xl">
+        {moods.map((mood, i) => {
+          const isSelected = activeMood?.label === mood.label;
+          return (
+            <button
+              key={i}
+              onClick={() => {
+                setActiveMood(mood);
+                setTypedMood("");
+              }}
+              className={`group flex flex-col items-center justify-center gap-3 p-5 h-24 rounded-2xl border transition-all duration-300 outline-none
+              ${isSelected 
+                ? mood.activeClass 
+                : "bg-white/[0.02] border-white/5 text-neutral-500 hover:border-white/20 hover:text-white"
+              } active:scale-95`}
+            >
+              <div className="transition-transform duration-300 group-hover:scale-110">
+                {mood.icon}
+              </div>
+              <span className="font-bold text-[10px] uppercase tracking-widest">
+                {mood.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Input: Simple and Clean */}
+      <div className="relative z-10 mt-8 w-full max-w-sm">
         <input
           value={typedMood}
           onChange={(e) => {
             setTypedMood(e.target.value);
             setActiveMood(null);
           }}
-          placeholder="Or type your mood… nostalgic, lonely"
-          className="w-full px-5 py-3 rounded-xl bg-white/5 backdrop-blur-md border border-white/10
-      focus:border-yellow-400 focus:ring-1 focus:ring-yellow-300 outline-none text-white placeholder:text-neutral-400"
+          placeholder="Or describe it: 'cozy', 'lonely'..."
+          className="w-full px-6 py-4 rounded-xl bg-white/[0.02] border border-white/5 focus:border-[#FFC509]/40 outline-none text-white text-xs placeholder:text-neutral-600 transition-all"
         />
       </div>
 
- 
       <button
-        onClick={() => {
-          if (activeMood) {
-            navigate(`/mood/${activeMood.label.toLowerCase()}`, {
-              state: { genres: activeMood.genres, mood: activeMood.label },
-            });
-          } else if (typedMood.trim()) {
-            navigate(`/mood/custom`, {
-              state: { mood: typedMood },
-            });
-          }
-        }}
+        onClick={handleSearch}
         disabled={!activeMood && !typedMood.trim()}
-        className="relative z-10 mt-7 px-8 py-3 bg-yellow-400 text-black font-semibold
-    rounded-xl hover:bg-yellow-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        className="relative z-10 mt-8 px-10 py-4 bg-white text-black font-black text-[10px] uppercase tracking-[0.2em]
+        rounded-xl hover:bg-[#FFC509] transition-all duration-300 disabled:opacity-20 group flex items-center gap-3 shadow-2xl"
       >
-        Find My Movies 🎬
+        Find Movies
+        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
       </button>
     </section>
   );

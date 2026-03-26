@@ -83,7 +83,7 @@ const WeeklySpotlight = () => {
                 {/* Refined "Weekly Spotlight" Label */}
                 <div className="flex items-center gap-2">
                   <span className="w-8 h-[1px] bg-white/10 hidden md:block"></span>
-                  <span className="text-[10px] md:text-xs font-bold text-white/30 uppercase tracking-[0.3em]">
+                  <span className="text-[10px] md:text-xs font-bold text-green-400 uppercase tracking-[0.3em]">
                     Weekly Spotlight
                   </span>
                 </div>

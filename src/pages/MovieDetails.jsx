@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   fetchMovieDetails,
   fetchSimilarMovies,
@@ -9,8 +10,9 @@ import QuickViewModal from "../components/modals/QuickViewModal";
 import TrailerModal from "../components/modals/TrailerModal";
 import { FadeLoader } from "react-spinners";
 import WatchlistButton from "../components/ui/WatchlistButton";
-import { IoPlay } from "react-icons/io5";
+import { IoPlay, IoStar, IoCreateOutline } from "react-icons/io5";
 import { HiOutlineArrowLongRight } from "react-icons/hi2";
+import { RiDoubleQuotesL } from "react-icons/ri";
 import userPlaceholder from "../assets/user-placeholder.png";
 import moviePlaceholder from "../assets/m-placeholder.png";
 import MovieCard from "../components/cards/MovieCard";
@@ -21,286 +23,237 @@ import GoBackBtn from "../components/ui/GoBackBtn";
 const MovieDetails = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
-  const [similar, setSimilar] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const [tmdbReviews, setTmdbReviews] = useState([]);
+  const [openReview, setOpenReview] = useState(false);
 
   const navigate = useNavigate();
-  const [openReview, setOpenReview] = useState(false);
+  const { reviews } = useReviews(id);
+  const displayReviews = reviews.length > 0 ? reviews.slice(0, 4) : tmdbReviews.slice(0, 4);
 
   useEffect(() => {
     const load = async () => {
-      const movieData = await fetchMovieDetails(id);
+      const [movieData, tmdb] = await Promise.all([
+        fetchMovieDetails(id),
+        fetchMovieReviews(id, 1)
+      ]);
       setMovie(movieData);
-
-      const tmdb = await fetchMovieReviews(id, 1);
       setTmdbReviews(tmdb.results || []);
-
-      const similarData = await fetchSimilarMovies(id);
-      setSimilar(similarData);
-
-      setSelectedMovie(null);
-      setTrailerKey(null);
     };
-
     load();
-  }, [id]);
-
-    // Load Cinemood reviews using useReviews hook
-  const { reviews, loading } = useReviews(movie?.id);
-
-    // Use Cinemood reviews first, fallback to TMDB reviews
-  const displayReviews =
-    reviews.length > 0 ? reviews.slice(0, 4) : tmdbReviews.slice(0, 4);
-
-  useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [id]);
 
-  if (!movie)
-    return (
-      <div className="p-6 ">
-        <FadeLoader
-          className="mx-auto mb-5"
-          color="#FFC509"
-          radius={-5}
-          speedMultiplier={1}
-          width={4}
-          loading
-        />
-      </div>
-    );
-
-  const trailer = movie.videos?.results?.find(
-    (v) => v.type === "Trailer" && v.site === "YouTube"
+  if (!movie) return (
+    <div className="flex justify-center items-center h-[60vh]">
+      <FadeLoader color="#FFC509" />
+    </div>
   );
 
-  const director = movie?.credits?.crew?.find((p) => p.job === "Director");
-
-  const writers =
-    movie?.credits?.crew?.filter((p) =>
-      ["Writer", "Screenplay", "Story"].includes(p.job)
-    ) || [];
+  const trailer = movie.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
+  
+  // High-performance arrow animation variants
+  const arrowVariant = {
+    initial: { x: 0 },
+    hover: { 
+      x: 6, 
+      transition: { 
+        repeat: Infinity, 
+        duration: 0.6, 
+        repeatType: "reverse",
+        ease: "easeInOut" 
+      } 
+    }
+  };
 
   return (
-    <div className="px-8 pb-6">
-      <GoBackBtn />
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        <img
-          src={
-            movie.poster_path
-              ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-              : moviePlaceholder
-          }
-          className="w-72 rounded-xl shadow-xl"
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }}
+      className="relative w-full"
+    >
+      {/* 1. Cinematic Backdrop Integration */}
+      {/* Pulls behind the pt-26 of RootLayout and expands to full viewport width */}
+      <div className="absolute -top-26 left-0 lg:-left-10 w-[100vw] h-[650px] pointer-events-none overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 blur-3xl scale-110"
+          style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` }}
         />
-        <div>
-          <h2 className="heading font-semibold text-3xl">{movie.title}</h2>
-
-          <div className="flex flex-col md:flex-row gap-3 mt-3 md:items-center">
-            <div className="flex gap-3">
-              {trailer && (
-                <button
-                  onClick={() => setTrailerKey(trailer.key)}
-                  className="flex items-center px-4 gap-1 py-2 bg-[#FFC509] cursor-pointer hover:bg-amber-300 rounded-lg text-black font-medium"
-                >
-                  <IoPlay /> Watch Trailer
-                </button>
-              )}
-
-              <WatchlistButton movie={movie} variant="details" />
-            </div>
-
-            <button
-              onClick={() => setOpenReview(true)}
-              className="py-2 px-4 hidden bg-neutral-800 rounded-lg border border-neutral-600 hover:bg-neutral-200 hover:text-black text-yellow-200 transition ease-in-out cursor-pointer"
-            >
-              ✍ Write Review
-            </button>
-          </div>
-
-          <p className="text-neutral-400 mt-2">
-            {movie.release_date} • {movie.runtime} min
-          </p>
-
-          <p className="mt-4 text-lg leading-relaxed max-w-300 text-neutral-200">
-            {movie.overview}
-          </p>
-
-          <div className="flex gap-3 mt-3">
-            {movie.genres.map((g) => (
-              <span
-                key={g.id}
-                className="px-3 py-2 text-sm rounded-full border border-neutral-500"
-              >
-                {g.name}
-              </span>
-            ))}
-          </div>
-
-          <section className="mt-2 px-2">
-            <div className="flex justify-between items-start">
-              <h2 className="py-3 text-xl font-bold">Cast Crew</h2>
-              <button
-                onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
-                className="mt-4 text-sm flex items-center gap-1 cursor-pointer text-[#FFC509] hover:underline"
-              >
-                View Full Cast & Crew <HiOutlineArrowLongRight size={23} />
-              </button>
-            </div>
-            <div className="grid grid-cols-4 md:flex gap-5 ">
-              {movie.credits.cast.slice(0, 10).map((actor) => (
-                <div
-                  key={actor.id}
-                  onClick={() => navigate(`/person/${actor.id}`)}
-                  className="text-center max-w-[70px] hover:scale-105 ease-in-out duration-200 cursor-pointer"
-                >
-                  <img
-                    src={
-                      actor.profile_path
-                        ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
-                        : userPlaceholder
-                    }
-                    className="rounded-full aspect-square object-cover"
-                  />
-
-                  <p className="text-sm mt-1">{actor.name} </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-white/10 mt-2 pt-1 flex flex-col gap-3">
-              {director && (
-                <p className="text-sm text-neutral-300">
-                  <span className="text-neutral-400">Director:</span>{" "}
-                  <span
-                    onClick={() => navigate(`/person/${director.id}`)}
-                    className="hover:text-[#FFC509] cursor-pointer"
-                  >
-                    {director.name}
-                  </span>
-                </p>
-              )}
-
-              {writers.length > 0 && (
-                <p className="text-sm text-neutral-300">
-                  <span className="text-neutral-400">Writers:</span>{" "}
-                  {writers.slice(0, 3).map((w, i) => (
-                    <span
-                      key={w.id}
-                      onClick={() => navigate(`/person/${w.id}`)}
-                      className="hover:text-[#FFC509] cursor-pointer"
-                    >
-                      {w.name}
-                      {i < writers.length - 1 && ", "}
-                    </span>
-                  ))}
-                </p>
-              )}
-            </div>
-          </section>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/90 to-[#0a0a0a]" />
       </div>
 
-      <section className="mt-10">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold mb-3">⭐Reviews</h2>
+      <div className="relative z-10 px-6 lg:px-0">
+        <GoBackBtn />
 
-          {openReview && (
-            <ReviewModal movie={movie} onClose={() => setOpenReview(false)} />
-          )}
+        <div className="flex flex-col lg:flex-row gap-12 mt-10">
+          {/* Poster Section */}
+          <motion.div 
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="shrink-0 mx-auto lg:mx-0"
+          >
+            <img
+              src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
+              className="w-64 md:w-72 rounded-2xl shadow-2xl border border-white/5"
+              alt={movie.title}
+            />
+          </motion.div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setOpenReview(true)}
-              className="px-4 py-2 bg-[#FFC509] text-black rounded-lg font-medium hover:bg-amber-300 transition"
-            >
-              ✍ Write Review
-            </button>
+          {/* Core Info Section */}
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="flex-1"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">{movie.title}</h1>
+            
+            <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-neutral-400 mb-6">
+              <span className="flex items-center gap-1 text-[#FFC509] bg-white/5 px-2 py-1 rounded-lg border border-white/10">
+                <IoStar size={16} /> {movie.vote_average?.toFixed(1)}
+              </span>
+              <span>{movie.release_date?.split('-')[0]}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-800" />
+              <span>{movie.runtime}m</span>
+              <span className="text-[10px] text-green-400 font-black uppercase tracking-widest border border-green-400/20 px-2.5 py-1 rounded shadow-sm">
+                MOVIE
+              </span>
+            </div>
 
-            <button
+            {/* Actions Bar */}
+            <div className="flex flex-wrap gap-3 mb-8">
+              {trailer && (
+                <button 
+                  onClick={() => setTrailerKey(trailer.key)} 
+                  className="flex items-center px-6 py-2.5 bg-[#FFC509] hover:bg-white transition-all duration-300 rounded-xl text-black font-bold gap-2 active:scale-95"
+                >
+                  <IoPlay size={20} /> TRAILER
+                </button>
+              )}
+              <WatchlistButton movie={movie} variant="details" />
+              <button 
+                onClick={() => setOpenReview(true)} 
+                className="flex items-center px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold gap-2 transition-all active:scale-95"
+              >
+                <IoCreateOutline size={20} className="text-green-400" /> WRITE REVIEW
+              </button>
+            </div>
+
+            <p className="text-neutral-300 leading-relaxed text-base mb-10 max-w-3xl italic font-medium">
+              {movie.overview}
+            </p>
+
+            {/* Cast Quick Scroller */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Field Operatives</h3>
+                <motion.button 
+                  whileHover="hover" 
+                  initial="initial"
+                  onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
+                  className="text-[10px] font-bold text-[#FFC509] flex items-center gap-2 uppercase tracking-widest"
+                >
+                  Full Cast <motion.span variants={arrowVariant}><HiOutlineArrowLongRight size={18} /></motion.span>
+                </motion.button>
+              </div>
+              <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-2">
+                {movie.credits?.cast?.slice(0, 8).map((actor) => (
+                  <div key={actor.id} onClick={() => navigate(`/person/${actor.id}`)} className="text-center min-w-[64px] cursor-pointer group">
+                    <img
+                      src={actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : userPlaceholder}
+                      className="w-14 h-14 rounded-full object-cover border border-white/5 group-hover:border-green-400/50 transition-all duration-300"
+                    />
+                    <p className="text-[10px] mt-2 font-medium text-neutral-500 group-hover:text-white truncate transition-colors">{actor.name.split(' ')[0]}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* 2. Glassmorphism Reviews Section */}
+        <section className="mt-24">
+          <div className="flex justify-between items-end mb-8">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold tracking-tight">User Reviews</h2>
+              <div className="h-1 w-10 bg-[#FFC509] rounded-full" />
+            </div>
+            <motion.button 
+              whileHover="hover" 
+              initial="initial"
               onClick={() => navigate(`/movie/${id}/reviews`)}
-              className="flex gap-1 text-[#FFC509] cursor-pointer hover:underline items-center"
+              className="text-[10px] font-bold text-[#FFC509] flex items-center gap-2 uppercase tracking-widest"
             >
-              View all reviews <HiOutlineArrowLongRight size={23} />
-            </button>
+              All Reviews <motion.span variants={arrowVariant}><HiOutlineArrowLongRight size={18} /></motion.span>
+            </motion.button>
           </div>
-        </div>
 
-        {loading && <p className="text-neutral-400">Loading reviews...</p>}
+          <div className="grid md:grid-cols-2 gap-6">
+            {displayReviews.length > 0 ? displayReviews.map((r, index) => (
+              <motion.div 
+                key={r.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 * index }}
+                className="relative p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group overflow-hidden"
+              >
+                <RiDoubleQuotesL className="absolute -top-2 -right-2 text-white/[0.03] size-24 pointer-events-none" />
+                <div className="relative z-10 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFC509] to-orange-500 flex items-center justify-center text-black font-black text-[10px]">
+                        {(r.username || r.author)[0]}
+                      </div>
+                      <span className="text-sm font-bold tracking-tight">{r.username || r.author}</span>
+                      {r.username && <span className="text-[8px] px-2 py-0.5 bg-green-400/20 text-green-400 rounded-full font-black uppercase">CineMood</span>}
+                    </div>
+                    <span className="text-[#FFC509] font-black text-xs tracking-widest">★ {r.rating || r.author_details?.rating || "?"}</span>
+                  </div>
+                  <p className="text-sm text-neutral-400 leading-relaxed line-clamp-3 italic font-medium">
+                    "{r.text || r.content}"
+                  </p>
+                </div>
+              </motion.div>
+            )) : (
+              <div className="col-span-2 py-12 text-center bg-white/[0.02] rounded-2xl border border-dashed border-white/10">
+                <p className="text-neutral-600 font-bold uppercase tracking-widest text-xs font-black italic">No Reviews Found...</p>
+              </div>
+            )}
+          </div>
+        </section>
 
-        {!loading && reviews.length === 0 && tmdbReviews.length === 0 && (
-          <p className="text-neutral-500">Be the first to review this movie.</p>
+        {/* Similar Movies Section */}
+        <section className="mt-20">
+          <MovieCard
+            title="Neural Matches"
+            fetchFn={() => fetchSimilarMovies(id)}
+            onSelectMovie={(movie) => setSelectedMovie(movie)}
+          />
+        </section>
+      </div>
+
+      {/* Modal Management with AnimatePresence */}
+      <AnimatePresence>
+        {openReview && (
+          <ReviewModal movie={movie} onClose={() => setOpenReview(false)} />
         )}
-
-        <div className="grid md:grid-cols-2 gap-4">
-          {displayReviews.map((r) =>
-            r.username ? (
-              // CINEMOOD REVIEW
-              <div
-                key={r.id}
-                className="bg-neutral-900 p-4 rounded-xl border border-yellow-400/40"
-              >
-                <div className="flex justify-between items-center text-sm">
-                  <span className="flex items-center gap-2">
-                    {r.username}
-                    <span className="bg-[#FFC509] text-black text-xs px-2 py-0.5 rounded-full">
-                      Cinemood User
-                    </span>
-                  </span>
-                  <span className="text-[#FFC509]">⭐ {r.rating}/5</span>
-                </div>
-                <p className="mt-2 text-sm text-neutral-200 line-clamp-4">
-                  {r.text}
-                </p>
-              </div>
-            ) : (
-              // TMDB REVIEW
-              <div
-                key={r.id}
-                className="bg-neutral-800/70 p-4 rounded-xl border border-white/10"
-              >
-                <div className="flex justify-between items-center text-sm text-neutral-400">
-                  <span>{r.author}</span>
-                  {r.author_details?.rating && (
-                    <span className="text-[#FFC509]">
-                      ⭐ {r.author_details.rating}/10
-                    </span>
-                  )}
-                </div>
-                <p className="mt-2 text-sm text-neutral-300 line-clamp-4">
-                  {r.content}
-                </p>
-              </div>
-            )
-          )}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <MovieCard
-          title="🎬 Similar Movies"
-          fetchFn={() => fetchSimilarMovies(id)}
-          onSelectMovie={(movie) => setSelectedMovie(movie)}
-        />
-
         {selectedMovie && (
-          <QuickViewModal
-            movie={selectedMovie}
-            onClose={() => setSelectedMovie(null)}
+          <QuickViewModal 
+            movie={selectedMovie} 
+            onClose={() => setSelectedMovie(null)} 
           />
         )}
-      </section>
-
-      {trailerKey && (
-        <TrailerModal
-          videoKey={trailerKey}
-          onClose={() => setTrailerKey(null)}
-        />
-      )}
-    </div>
+        {trailerKey && (
+          <TrailerModal 
+            videoKey={trailerKey} 
+            onClose={() => setTrailerKey(null)} 
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

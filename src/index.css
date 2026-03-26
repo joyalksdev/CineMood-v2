@@ -117,3 +117,12 @@ body {
     width: 3px;
   }
 }
+
+.fadmin-drop{
+  background: #101010;
+}
+
+.fadmin-drop option{
+  color: #fff;
+  font-weight: 400;
+}
