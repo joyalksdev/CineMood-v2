@@ -1,102 +1,121 @@
 import { useState } from "react";
-import { X, Star } from "lucide-react";
+import { X, MessageSquareQuote, Send, Star } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { addReview } from "../../services/reviewService";
-import { useUser } from "../../context/UserContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ReviewModal = ({ movie, onClose }) => {
-  const { user } = useUser();
-  const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
+  const [rating, setRating] = useState(5); // Default to middle
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Inside ReviewModal.jsx
 const submitReview = async () => {
-  if (!rating || !text.trim()) {
-    toast.error("Please select a rating and write a review");
-    return;
-  }
-
-  try {
-    setLoading(true);
+    if (text.trim().length < 5) return toast.error("Tell us a bit more about the vibe!");
     
-    // We call our new API service
-    await addReview({
-      movieId: movie.id.toString(), // Ensure it's a string if your backend expects it
-      rating: rating,
-      content: text.trim() // Backend uses 'content', frontend state uses 'text'
-    });
+    try {
+      setLoading(true);
+      await addReview({
+        movieId: movie.id.toString(),
+        movieTitle: movie.title, // Critical for backend logging
+        rating: Number(rating),
+        content: text.trim()
+      });
 
-    toast.success("Review published to CineMood! 🎬");
-    onClose();
-  } catch (err) {
-    // If the interceptor clears the user on 401, we handle the UI error here
-    const errorMsg = err.response?.data?.message || "Failed to post review";
-    toast.error(errorMsg);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      toast.success(`Review for ${movie.title} published! 🎬`);
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to post review");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-center z-50">
-      <div className="bg-zinc-900 w-[90%] max-w-md rounded-2xl p-6 border border-white/10 shadow-2xl">
-       
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Review – {movie.title}</h2>
-          <button onClick={onClose}>
-            <X size={20} className="text-neutral-400 hover:text-white" />
-          </button>
-        </div>
-
-        <div className="flex justify-center gap-2 mb-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-          <Star
-            key={n}
-            size={24} // Slightly smaller size to fit 10 stars
-            className={`cursor-pointer transition ${
-              (hover || rating) >= n
-                ? "fill-yellow-400 text-yellow-400"
-                : "text-neutral-500"
-            }`}
-            onMouseEnter={() => setHover(n)}
-            onMouseLeave={() => setHover(0)}
-            onClick={() => setRating(n)}
+    <motion.div 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/80 backdrop-blur-xl flex justify-center items-center z-[120] p-4"
+    >
+      <motion.div 
+        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
+        className="bg-[#0f0f0f] w-full max-w-lg rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden"
+      >
+        {/* Header with Backdrop */}
+        <div className="relative h-32 w-full overflow-hidden">
+          <img 
+            src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`} 
+            className="w-full h-full object-cover opacity-20 grayscale"
+            alt=""
           />
-        ))}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/50 to-transparent" />
+          <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-black/40 hover:bg-white/10 rounded-full transition-colors">
+            <X size={20} className="text-white" />
+          </button>
+          <div className="absolute bottom-4 left-8">
+             <h2 className="text-2xl font-bold text-white tracking-tight italic">Reviewing {movie.title}</h2>
+          </div>
         </div>
 
-        <p className="text-center text-sm text-neutral-400 mb-3">
-          {rating ? `You rated ${rating} stars` : "Tap to rate"}
-        </p>
+        <div className="p-8">
+          {/* Vibe Slider Section */}
+          <div className="flex flex-col items-center mb-10">
+            <div className="relative flex items-center justify-center mb-6">
+              <span className="text-6xl font-black text-[#FFC509] drop-shadow-[0_0_15px_rgba(255,197,9,0.4)]">
+                {rating}
+              </span>
+              <span className="text-xl font-bold text-neutral-600 ml-2 mt-4">/ 10</span>
+            </div>
 
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Share your honest thoughts..."
-          className="w-full h-28 bg-black/40 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
-        />
+            <div className="w-full px-4 relative">
+              <input
+                type="range"
+                min="1"
+                max="10"
+                step="1"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#FFC509] transition-all"
+                style={{
+                  background: `linear-gradient(to right, #FFC509 0%, #FFC509 ${(rating - 1) * 11.11}%, #1f1f1f ${(rating - 1) * 11.11}%, #1f1f1f 100%)`
+                }}
+              />
+              <div className="flex justify-between mt-3 px-1">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                  <span key={num} className={`text-[10px] font-bold ${rating == num ? 'text-[#FFC509]' : 'text-neutral-700'}`}>
+                    {num}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        
-        <div className="flex justify-end gap-3 mt-5">
-          <button
-            onClick={onClose}
-            className="text-sm text-neutral-400 hover:text-white"
-          >
-            Cancel
-          </button>
+          {/* Review Input */}
+          <div className="relative group">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="What made this a vibe for you?"
+              className="w-full h-36 bg-white/[0.03] border border-white/10 rounded-[1.5rem] p-5 text-sm text-neutral-200 resize-none focus:outline-none focus:border-[#FFC509]/30 transition-all"
+            />
+          </div>
 
-          <button
-            disabled={loading}
-            onClick={submitReview}
-            className="bg-yellow-400 text-black px-5 py-2 rounded-lg font-medium hover:bg-yellow-300 disabled:opacity-50"
-          >
-            {loading ? "Publishing..." : "Publish Review"}
-          </button>
+          {/* Footer Actions */}
+          <div className="flex items-center justify-between mt-8">
+            <button onClick={onClose} className="text-sm font-semibold text-neutral-500 hover:text-white transition-colors">
+              Maybe later
+            </button>
+
+            <button
+              disabled={loading}
+              onClick={submitReview}
+              className="group flex items-center gap-2 bg-[#FFC509] text-black px-8 py-3.5 rounded-2xl font-bold text-sm hover:bg-yellow-400 transition-all active:scale-95 disabled:opacity-30 shadow-[0_10px_20px_rgba(255,197,9,0.15)]"
+            >
+              {loading ? "Publishing..." : "Publish Review"}
+              {!loading && <Send size={16} className="group-hover:translate-x-1 transition-transform" />}
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

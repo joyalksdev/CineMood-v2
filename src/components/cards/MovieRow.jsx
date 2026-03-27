@@ -62,7 +62,7 @@ const MovieRow = ({ rowId, title, fetchFn }) => {
           <ChevronRight size={32} />
         </button>
 
-        <div ref={rowRef} className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory">
+        <div ref={rowRef} className="flex gap-0 md:gap-3 overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory">
           {loading ? (
             [...Array(8)].map((_, i) => <CardSkelton key={i} />)
           ) : (

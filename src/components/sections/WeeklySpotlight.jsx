@@ -71,7 +71,7 @@ const WeeklySpotlight = () => {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC509]/10 border border-[#FFC509]/20">
                     <Sparkles className="text-[#FFC509]" size={12} />
-                    <span className="text-[#FFC509] text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Neural Intelligence v2.5</span>
+                    <span className="text-[#FFC509] text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">AI Neural Intelligence v2.0</span>
                   </div>
                   
                   <InfoTooltip 

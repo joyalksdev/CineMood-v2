@@ -11,3 +11,9 @@ export const getMovieReviews = async (movieId) => {
   const response = await api.get(`/reviews/${movieId}`);
   return response.data;
 };
+
+
+export const reportReview = async (reviewId, reason) => {
+  const response = await api.put(`/reviews/${reviewId}/report`, { reason });
+  return response.data;
+};

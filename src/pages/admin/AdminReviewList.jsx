@@ -29,6 +29,17 @@ const AdminReviewList = () => {
     }
   };
 
+  const handleDismiss = async (id) => {
+  try {
+    await api.put(`/admin/reviews/${id}/dismiss`);
+    toast.success("Reports cleared");
+    // Update local state so the red/orange UI disappears immediately
+    setReviews(reviews.map(r => r._id === id ? { ...r, isFlagged: false, reportCount: 0 } : r));
+  } catch (err) {
+    toast.error("Failed to clear reports");
+  }
+};
+
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -98,57 +109,58 @@ const AdminReviewList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {reviews.map((rev) => (
-            <div key={rev._id} className="group bg-[#0A0A0A] border border-white/5 hover:border-[#FFC509]/30 rounded-3xl p-6 transition-all duration-500 flex flex-col justify-between relative overflow-hidden">
+           <div key={rev._id} className={`group bg-[#0A0A0A] border rounded-3xl p-6 transition-all duration-500 flex flex-col justify-between relative overflow-hidden ${
+              rev.isFlagged ? "border-red-500/40 bg-red-500/[0.02]" : rev.reportCount > 0 ? "border-orange-500/30" : "border-white/5 hover:border-[#FFC509]/30"
+            }`}>
               
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-10 w-10 shrink-0 rounded-xl bg-neutral-900 border border-white/10 flex items-center justify-center text-[#FFC509] font-bold">
-                      {rev.userName?.charAt(0) || "U"}
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="text-sm font-bold text-white group-hover:text-[#FFC509] transition-colors truncate">
-                        {rev.userName}
-                      </h4>
-                      <div className="flex items-center gap-1 text-[10px] text-neutral-600 font-medium">
-                        <Mail size={10} />
-                        <span className="truncate">{rev.userId?.email || "Guest User"}</span>
-                      </div>
-                    </div>
+              {/* Top Section: User Info + Status Badges */}
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-neutral-900 border border-white/10 flex items-center justify-center text-[#FFC509] font-bold">
+                    {rev.userName?.charAt(0) || "U"}
                   </div>
-                  <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 shrink-0">
-                    <Star size={10} className="text-[#FFC509] fill-[#FFC509]" />
-                    <span className="text-[11px] font-bold text-white">{rev.rating}</span>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{rev.userName}</h4>
+                    <span className="text-[10px] text-neutral-600 truncate block max-w-[120px]">{rev.userId?.email || "Guest"}</span>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
-                    <Film size={12} className="text-neutral-700" /> 
-                    Movie ID: <span className="text-neutral-400">{rev.movieId}</span>
-                  </div>
-                  <div className="bg-white/[0.01] p-4 rounded-2xl border border-white/5 relative">
-                    <p className="text-neutral-400 text-xs leading-relaxed font-medium italic">
-                      "{rev.content}"
-                    </p>
+                <div className="flex items-center gap-2">
+                  {rev.isFlagged && <span className="bg-red-500/10 text-red-500 text-[9px] font-black px-2 py-1 rounded-md border border-red-500/20 uppercase">Flagged</span>}
+                  {rev.reportCount > 0 && <span className="bg-orange-500/10 text-orange-500 text-[9px] font-black px-2 py-1 rounded-md border border-orange-500/20 uppercase">{rev.reportCount} Reports</span>}
+                  <div className="flex items-center gap-1 bg-black/40 px-2 py-1 rounded-md border border-white/5 text-[11px] font-bold text-white">
+                    <Star size={10} className="text-[#FFC509] fill-[#FFC509]" /> {rev.rating}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-5 border-t border-white/5 flex justify-between items-center">
-                <div className="flex items-center gap-1 text-[10px] text-neutral-600 font-bold">
-                  <Calendar size={12} className="opacity-50" />
-                  {new Date(rev.createdAt).toLocaleDateString()}
-                </div>
+              {/* Content Section */}
+              <div className="bg-white/[0.01] p-4 rounded-2xl border border-white/5 mb-6">
+                <p className="text-neutral-400 text-xs leading-relaxed italic">"{rev.content}"</p>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                <span className="text-[10px] text-neutral-600 font-bold uppercase">{new Date(rev.createdAt).toLocaleDateString()}</span>
                 
-                <Tooltip text="Delete Review">
+                <div className="flex gap-2">
+                  {/* DISMISS BUTTON: Only shows if there are reports */}
+                  {(rev.reportCount > 0 || rev.isFlagged) && (
+                    <button 
+                      onClick={() => handleDismiss(rev._id)}
+                      className="px-3 py-1.5 rounded-lg bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10 transition-all text-[10px] font-bold uppercase"
+                    >
+                      Check & Approve
+                    </button>
+                  )}
+                  
                   <button 
                     onClick={() => openDeleteModal(rev._id)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/5 text-red-500/70 hover:bg-red-500 hover:text-white transition-all text-[10px] font-bold uppercase"
+                    className="px-3 py-1.5 rounded-lg bg-red-500/5 text-red-500/70 hover:bg-red-500 hover:text-white transition-all text-[10px] font-bold uppercase flex items-center gap-1"
                   >
-                    <Trash2 size={13} /> Delete
+                    <Trash2 size={12} /> Delete
                   </button>
-                </Tooltip>
+                </div>
               </div>
             </div>
           ))}

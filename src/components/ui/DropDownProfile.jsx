@@ -33,7 +33,7 @@ const DropDownProfile = () => {
     <div className="relative" ref={dropdownRef}>
       {/* Profile Trigger */}
       <div className="relative group cursor-pointer" onClick={() => setOpenDropdown(!openDropdown)}>
-        <div className={`absolute -inset-0.5 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500 ${user?.role === 'admin' ? 'bg-red-500' : 'bg-[#FFC509]'}`} />
+        <div className={`absolute -inset-0.5 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500 ${user?.role === 'admin' ? 'bg-green-500' : 'bg-[#FFC509]'}`} />
         <img
           src={user?.avatar && user.avatar !== "" 
             ? user.avatar 
@@ -50,7 +50,7 @@ const DropDownProfile = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-4 w-48 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-[100]"
+            className="absolute right-0 mt-4 w-48 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-[100]"
           >
             {/* Header / User Info */}
             <div className="px-4 py-4 border-b border-white/5 bg-white/[0.02]">
