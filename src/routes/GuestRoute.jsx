@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom"; // Add Outlet
 import { useUser } from "../context/UserContext";
 
 const GuestRoute = ({ children }) => {
@@ -6,12 +6,15 @@ const GuestRoute = ({ children }) => {
 
   if (loading) return null;
 
-  // If user exists, send them away from Login/Register
   if (user) {
-    return user.onboarded ? <Navigate to="/home" replace /> : <Navigate to="/get-started" replace />;
+    return user.onboarded 
+      ? <Navigate to="/home" replace /> 
+      : <Navigate to="/get-started" replace />;
   }
 
-  return children;
+  // If children exist (component wrapper), use them. 
+  // Otherwise, use Outlet (layout wrapper).
+  return children ? children : <Outlet />;
 };
 
 export default GuestRoute;

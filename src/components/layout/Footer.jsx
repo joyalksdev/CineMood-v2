@@ -1,7 +1,8 @@
 import React from 'react'
 import logo from '../../assets/logo.png'
 import { Link } from 'react-router-dom'
-import { Github, Twitter, Instagram, Mail } from 'lucide-react'
+import { Github, Twitter, Instagram, Mail, Linkedin } from 'lucide-react'
+import { FaInstagram } from 'react-icons/fa'
 
 const Footer = () => {
   return (
@@ -24,13 +25,13 @@ const Footer = () => {
           
           {/* Social Icons - Simple Way */}
           <div className='flex gap-4 mt-2'>
-            <a href="#" className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:bg-[#FFC509] hover:text-black transition-all">
+            <a href="https://github.com/joyalksdev" target='_blank' className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:bg-[#FFC509] hover:text-black transition-all">
               <Github size={18} />
             </a>
-            <a href="#" className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:bg-[#FFC509] hover:text-black transition-all">
-              <Twitter size={18} />
+            <a href="https://www.linkedin.com/in/joyalks" target='_blank' className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:bg-[#FFC509] hover:text-black transition-all">
+              <Linkedin size={18} />
             </a>
-            <a href="#" className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:bg-[#FFC509] hover:text-black transition-all">
+            <a href="https://www.instagram.com/joyalks.dev" target='_blank' className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:bg-[#FFC509] hover:text-black transition-all">
               <Instagram size={18} />
             </a>
           </div>
@@ -48,17 +49,17 @@ const Footer = () => {
         {/* Support Links */}
         <div className='flex flex-col gap-3'>
           <h3 className='text-white font-bold text-lg mb-1'>Support</h3>
-          <Link to='#' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">FAQ</Link>
-          <Link to='#' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Help Centre</Link>
-          <Link to='#' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Contact Us</Link>
+          <Link to='/help' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">FAQ</Link>
+          <Link to='/help' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Help Centre</Link>
+          <Link to='/contact' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Contact Developer</Link>
         </div>
 
         {/* Legal Links */}
         <div className='flex flex-col gap-3'>
           <h3 className='text-white font-bold text-lg mb-1'>Legal</h3>
-          <Link to='#' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Privacy Policy</Link>
-          <Link to='#' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Terms & Conditions</Link>
-          <Link to='#' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Cookie Policy</Link>
+          <Link to='/legal#privacy' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Privacy Policy</Link>
+          <Link to='/legal#terms' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Terms & Conditions</Link>
+          <Link to='/legal#cookies' className="text-neutral-400 text-sm hover:text-[#FFC509] transition-colors">Cookie Policy</Link>
         </div>
 
       </div>

@@ -92,7 +92,7 @@ const QuickViewModal = ({ movie, onClose }) => {
                   </span>
                 </div>
                 
-                <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-[0.85] italic drop-shadow-2xl">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-[0.85] italic drop-shadow-2xl">
                   {movie.title}
                 </h2>
               </div>

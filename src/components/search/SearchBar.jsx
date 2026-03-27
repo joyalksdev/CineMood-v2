@@ -76,7 +76,7 @@ const SearchBar = ({ isOpen, onClose }) => {
 
         {/* Results Dropdown (Scrollable, High Visibility) */}
         {showResults && query.length > 0 && (
-          <div className="absolute mt-3 w-full max-h-[70vh] overflow-y-auto bg-stone-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] z-50 custom-scrollbar animate-in fade-in slide-in-from-top-4 duration-300">
+          <div data-lenis-prevent className="absolute mt-3 w-full max-h-[70vh] overflow-y-auto bg-stone-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] z-50 custom-scrollbar animate-in fade-in slide-in-from-top-4 duration-300">
             
             {/* Movies Section */}
             {movieResults.length > 0 && (

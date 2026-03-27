@@ -4,6 +4,7 @@ import { discoverByGenre, searchByMoodKeyword } from '../services/tmbdApi'
 import { FadeLoader } from 'react-spinners'
 import QuickViewModal from '../components/modals/QuickViewModal'
 import moviePlaceholder from "../assets/m-placeholder.png"
+import ScrollToTopButton from '../components/ui/ScrollToTopButton'
 
 const MoodResults = () => {
   const { state } = useLocation()
@@ -145,6 +146,7 @@ const MoodResults = () => {
           )}
         </div>
       </div>
+      <ScrollToTopButton />
     </div>
   )
 }

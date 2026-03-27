@@ -106,7 +106,7 @@ const VibeSearch = ({ onSelectMovie }) => {
       <div className="max-w-3xl mx-auto text-center mb-12">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-green-400 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] mb-6 animate-fade-in">
           <Sparkles size={14} className="animate-pulse" />
-          CineMood Neural Engine v2.5
+          AI Neural Engine v2.5
         </div>
 
         <h2 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r py-5 from-[#FFC509] to-orange-500 bg-clip-text text-transparent tracking-tighter">
@@ -209,32 +209,42 @@ const VibeSearch = ({ onSelectMovie }) => {
 
       {/* Results Grid */}
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {results.map((movie, index) => (
-          <div
-            key={movie.id}
-          onClick={() => setSelectedMovie(movie)}
-            className="group cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
-            style={{ animationDelay: `${index * 70}ms` }}
-          >
-            <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-neutral-800 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-              <img
-                src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                alt={movie.title}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                <p className="font-bold text-[13px] leading-tight mb-1">{movie.title}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-white/50">{movie.release_date?.split("-")[0]}</span>
-                  <div className="flex items-center gap-1 text-[#FFC509]">
-                    <Star size={10} fill="#FFC509" />
-                    <span className="text-[10px] font-black">{movie.vote_average?.toFixed(1)}</span>
+        {results.map((movie, index) => {
+          // ADD THIS CHECK: Skip rendering if movie data is missing
+          if (!movie) return null;
+
+          return (
+            <div
+              key={movie.id || index} // Fallback to index if ID is missing
+              onClick={() => setSelectedMovie(movie)}
+              className="group cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
+              style={{ animationDelay: `${index * 70}ms` }}
+            >
+              <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-neutral-800 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                <img
+                  src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  alt={movie.title || "Movie Poster"}
+                />
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                  <p className="font-bold text-[13px] leading-tight mb-1">{movie.title || "Untitled"}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/50">
+                      {movie.release_date?.split("-")[0] || "N/A"}
+                    </span>
+                    <div className="flex items-center gap-1 text-[#FFC509]">
+                      <Star size={10} fill="#FFC509" />
+                      <span className="text-[10px] font-black">
+                        {movie.vote_average ? movie.vote_average.toFixed(1) : "0.0"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       {selectedMovie && (
         <QuickViewModal 

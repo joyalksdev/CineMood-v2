@@ -21,6 +21,7 @@ import ReviewModal from "../components/modals/ReviewModal";
 import GoBackBtn from "../components/ui/GoBackBtn";
 import { Flag } from "lucide-react";
 import ReportModal from "../components/modals/ReportModal";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -306,6 +307,7 @@ const MovieDetails = () => {
           <TrailerModal videoKey={trailerKey} onClose={() => setTrailerKey(null)} />
         )}
       </AnimatePresence>
+      <ScrollToTopButton />
     </motion.div>
   );
 };

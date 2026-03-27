@@ -26,7 +26,7 @@ const ResetPassword = () => {
 
       if (data.success) {
         setStatus("success");
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setTimeout(() => navigate('/home'), 2000);
       }
     } catch (err) {
       setStatus("error");

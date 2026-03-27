@@ -6,6 +6,7 @@ import CardSkelton from '../components/cards/CardSkelton'
 import FilterBar from '../components/search/FilterBar'
 // Import the specific Grid Card component to avoid prop-mismatch errors
 import MovieGridCard from '../components/cards/MovieGridCard' 
+import ScrollToTopButton from '../components/ui/ScrollToTopButton'
 
 const BrowseMovies = () => {
   const [movies, setMovies] = useState([])
@@ -92,6 +93,7 @@ const BrowseMovies = () => {
           </div>
         )}
       </div>
+      <ScrollToTopButton />
     </div>
   )
 }

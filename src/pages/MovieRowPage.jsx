@@ -13,6 +13,7 @@ import { FadeLoader } from "react-spinners"
 import { Search, ArrowLeft } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import GoBackBtn from "../components/ui/GoBackBtn"
+import QuickViewModal from "../components/modals/QuickViewModal"
 
 const API_MAP = {
   now_playing: fetchNowPlayingMovies,
@@ -37,6 +38,7 @@ const MovieRowPage = () => {
   const [movies, setMovies] = useState([])
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
+  const [selectedMovie, setSelectedMovie] = useState(null)
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" })
@@ -56,6 +58,10 @@ const MovieRowPage = () => {
   return (
     <div className="min-h-screen px-6 md:px-12 py-10">
       
+      {selectedMovie && (
+        <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
+      )}
+
       {/* Back Button & Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div className="space-y-2">
@@ -95,7 +101,7 @@ const MovieRowPage = () => {
           {filtered.length > 0 ? (
             <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10">
               {filtered.map(movie => (
-                <MovieGridCard key={movie.id} movie={movie} />
+                <MovieGridCard key={movie.id} movie={movie} onSelectMovie={setSelectedMovie} />
               ))}
             </div>
           ) : (

@@ -1,34 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { HelpCircle, X, Send, MessageSquare, Mail, User, Loader2 } from 'lucide-react';
+import api from "../../services/axios"; // Assuming your axios instance is here
+import toast from "react-hot-toast";
 
 const SupportModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false); // Tracks the transition state
+  const [isAnimating, setIsAnimating] = useState(false); 
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("idle");
 
-  // Handle the transition logic for smooth closing
   const toggleModal = (value) => {
     if (value) {
       setIsOpen(true);
-      setTimeout(() => setIsAnimating(true), 10); // Tiny delay to trigger CSS transition
+      setTimeout(() => setIsAnimating(true), 10);
     } else {
       setIsAnimating(false);
-      setTimeout(() => setIsOpen(false), 500); // Match this to your duration-500
+      setTimeout(() => setIsOpen(false), 500);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("sending");
-    setTimeout(() => {
-      setStatus("success");
-      setTimeout(() => {
-        toggleModal(false);
-        setStatus("idle");
-        setFormData({ name: "", email: "", message: "" });
-      }, 2000);
-    }, 1500);
+
+    try {
+      // Real API call to your support controller
+      const { data } = await api.post('/support/contact', formData);
+
+      if (data.success) {
+        setStatus("success");
+        toast.success("Transmission Received 🚀");
+        
+        // Auto-close after success
+        setTimeout(() => {
+          toggleModal(false);
+          setStatus("idle");
+          setFormData({ name: "", email: "", message: "" });
+        }, 2000);
+      }
+    } catch (error) {
+      setStatus("idle");
+      const errorMsg = error.response?.data?.message || "Transmission failed. Check your connection.";
+      toast.error(errorMsg);
+      console.error("Support Error:", error);
+    }
   };
 
   return (
@@ -50,7 +65,6 @@ const SupportModal = () => {
       {isOpen && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-6">
           
-          {/* Fading & Blurring Backdrop */}
           <div 
             className={`absolute inset-0 bg-black/80 transition-all duration-500 ease-out ${
               isAnimating ? "opacity-100 backdrop-blur-xl" : "opacity-0 backdrop-blur-0"
@@ -58,14 +72,12 @@ const SupportModal = () => {
             onClick={() => toggleModal(false)}
           />
 
-          {/* Modal Card with Scale & Slide Animation */}
           <div className={`relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-all duration-500 ease-out ${
             isAnimating 
               ? "opacity-100 scale-100 translate-y-0" 
               : "opacity-0 scale-95 translate-y-10"
           }`}>
             
-            {/* Header */}
             <div className="p-8 pb-0 flex justify-between items-start">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC509]/10 text-[#FFC509] text-[10px] font-black uppercase tracking-widest mb-4 animate-pulse">
@@ -84,7 +96,6 @@ const SupportModal = () => {
               </button>
             </div>
 
-            {/* Contact Form */}
             <form onSubmit={handleSubmit} className="p-8 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">

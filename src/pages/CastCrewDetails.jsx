@@ -5,6 +5,7 @@ import { fetchMovieCredits, fetchMovieDetails } from "../services/tmbdApi";
 import userPlaceholder from "../assets/user-placeholder.png";
 import GoBackBtn from '../components/ui/GoBackBtn';
 import { FadeLoader } from "react-spinners";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 
 const CastCrewDetails = () => {
   const { id } = useParams();
@@ -127,6 +128,7 @@ const CastCrewDetails = () => {
           </div>
         </section>
       </div>
+      <ScrollToTopButton />
     </motion.div>
   );
 };

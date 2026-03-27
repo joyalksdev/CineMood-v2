@@ -49,7 +49,6 @@ const Register = () => {
 
   return (
     <>
-      <LoginNavbar showGetStarted={false} />
       <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10">
         {loading ? (
           <div className="flex flex-col items-center justify-center p-10">
@@ -148,7 +147,6 @@ const Register = () => {
           </div>
         )}
       </main>
-      <Footer />
     </>
   );
 };

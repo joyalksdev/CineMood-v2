@@ -10,6 +10,7 @@ import { useReviews } from "../services/useReviews";
 import { IoStar, IoCreateOutline } from "react-icons/io5";
 import { RiDoubleQuotesL } from "react-icons/ri";
 import { Flag } from "lucide-react"; // For the report icon
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 
 const MovieReviews = () => {
   const { id } = useParams();
@@ -176,6 +177,7 @@ const MovieReviews = () => {
           />
         )}
       </AnimatePresence>
+      <ScrollToTopButton />
     </motion.div>
   );
 };

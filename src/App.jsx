@@ -33,6 +33,11 @@ import AdminReviewList from './pages/admin/AdminReviewList'
 import AdminBroadcast from './pages/admin/AdminBroadcast'
 import AdminRoute from "./routes/AdminRoute";
 import AdminLogs from "./pages/admin/AdminLogs";
+import PublicLayout from "./components/layout/PublicLayout";
+import Contact from "./pages/Contact";
+import ScrollToTop from "./components/utils/ScrollToTop";
+import HelpPage from "./pages/HelpPage";
+import LegalDocs from "./pages/LegalDocs";
 
 const App = () => {
   const { user, loading } = useUser();
@@ -86,8 +91,9 @@ const App = () => {
         },
       }}
     />
-      <Routes>
-
+      <ScrollToTop/>
+     <Routes>
+        {/* --- 1. ADMIN SECTION --- */}
         <Route path="/admin" element={<AdminRoute />}>
           <Route element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} /> 
@@ -98,49 +104,36 @@ const App = () => {
           </Route>
         </Route>
 
+        {/* --- 2. PUBLIC & GUEST SECTION (All Under PublicLayout) --- */}
+        <Route element={<PublicLayout />}>
+          
+          {/* Smart Landing Logic */}
+          <Route
+            path="/"
+            element={
+              user ? (
+                user.onboarded ? <Navigate to="/home" replace /> : <Navigate to="/get-started" replace />
+              ) : (
+                <Landing />
+              )
+            }
+          />
 
-        {/* 1. PUBLIC & SMART REDIRECT: Landing Page */}
-        <Route
-          path="/"
-          index // Add the index prop here
-          element={
-            user ? (
-              user.onboarded ? <Navigate to="/home" replace /> : <Navigate to="/get-started" replace />
-            ) : (
-              <Landing />
-            )
-          }
-        />
+          {/* Static Public Pages */}
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/legal" element={<LegalDocs />} />
 
-        {/* 2. AUTH ROUTES: Redirects logged-in users to /home automatically */}
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <Login />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <GuestRoute>
-              <Register />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/forgot"
-          element={
-            <GuestRoute>
-              <ForgotPassword />
-            </GuestRoute>
-          }
-        />
+          {/* Auth Pages (Wrapped in GuestRoute to block logged-in users) */}
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+          </Route>
+        </Route>
 
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-        {/* 3. ONBOARDING: Protected specifically for new logged-in users */}
+        {/* --- 3. ONBOARDING (Special Case) --- */}
         <Route
           path="/get-started"
           element={
@@ -150,7 +143,7 @@ const App = () => {
           }
         />
 
-        {/* 4. PROTECTED APP ROUTES: Requires Login + Onboarding Completion */}
+        {/* --- 4. PROTECTED APP SECTION --- */}
         <Route
           element={
             <ProtectedRoute>
@@ -172,7 +165,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
         </Route>
 
-        {/* 5. CATCH ALL */}
+        {/* --- 5. CATCH ALL --- */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
