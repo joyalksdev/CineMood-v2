@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TbMovie } from "react-icons/tb";
+import { TbMovie, TbStar } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import WatchlistButton from "../ui/WatchlistButton";
 import mHPlaceholder from "../../assets/m-h-placeholder.png";
@@ -11,7 +11,24 @@ const QuickViewModal = ({ movie, onClose }) => {
   const navigate = useNavigate();
   const [openReview, setOpenReview] = useState(false);
 
+  // --- DATA FIXES ---
   const backdrop = movie.backdrop_path?.trim();
+  
+  // 1. Use 'rating' if 'vote_average' doesn't exist (Matches your console log)
+  const displayRating = movie.rating || movie.vote_average || 0;
+  
+  // 2. Adjust Trending logic: If popularity is missing, use a fallback or lower threshold
+  const isTrending = movie.popularity > 500 || movie.media_type === "movie"; 
+
+  // 3. Genre Map
+  const genreMap = { 28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime", 99: "Doc", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 10770: "TV", 53: "Thriller", 10752: "War", 37: "Western" };
+
+  // 4. FIX: If genre_ids is missing in the object, show a default or check 'genres' array
+  const genresToDisplay = movie.genre_ids 
+    ? movie.genre_ids.slice(0, 3).map(id => genreMap[id]) 
+    : movie.genres 
+      ? movie.genres.slice(0, 3).map(g => g.name)
+      : ["Movie"]; // Fallback if both are missing
 
   useEffect(() => {
     const handler = (e) => {
@@ -27,7 +44,7 @@ const QuickViewModal = ({ movie, onClose }) => {
     <AnimatePresence>
       {movie && (
         <motion.div
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -37,85 +54,89 @@ const QuickViewModal = ({ movie, onClose }) => {
             initial={{ scale: 0.9, opacity: 0, y: 40 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 40 }}
-            transition={{ duration: 0.3 }}
-            className="bg-zinc-900/90 backdrop-blur-xl text-white w-[92%] max-w-200 
-            rounded-3xl shadow-2xl overflow-hidden border border-white/10"
+            className="bg-[#0b0b0b] text-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 relative"
           >
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 w-9 h-9 flex items-center justify-center 
-              rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-yellow-400 
-              hover:text-black transition z-10"
+              className="absolute right-6 top-6 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-yellow-400 hover:text-black transition z-20 border border-white/10"
             >
               ✕
             </button>
 
-            <div className="relative h-[280px] md:h-[340px]">
+            <div className="relative h-[280px] md:h-[320px]">
               <img
-                src={
-                  backdrop
-                    ? `https://image.tmdb.org/t/p/original${backdrop}`
-                    : mHPlaceholder
-                }
+                src={backdrop ? `https://image.tmdb.org/t/p/original${backdrop}` : mHPlaceholder}
                 className="w-full h-full object-cover"
+                alt={movie.title}
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0b] via-[#0b0b0b]/40 to-transparent" />
 
-              <div className="absolute bottom-4 left-6 right-6">
-                <h2 className="text-2xl md:text-3xl font-bold tracking-wide">
+              <div className="absolute bottom-0 left-10 right-10">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {/* Trending Badge (Adjusted threshold) */}
+                  {isTrending && (
+                    <span className="bg-[#FFC509] text-black text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-tighter shadow-xl">
+                      Trending
+                    </span>
+                  )}
+                  
+                  {/* Recommended Badge (Using corrected displayRating) */}
+                  {displayRating >= 7 && (
+                    <span className="bg-green-500 text-black text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-tighter shadow-xl flex items-center gap-1">
+                      <TbStar className="fill-black" /> Recommended
+                    </span>
+                  )}
+
+                  <span className="text-white/60 text-xs font-bold tracking-widest ml-1">
+                    {movie.release_date?.split("-")[0]}
+                  </span>
+                </div>
+                
+                <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-[0.85] italic drop-shadow-2xl">
                   {movie.title}
                 </h2>
-
-                <div className="flex items-center gap-3 mt-2 text-sm text-neutral-300">
-                  <span className="px-2 py-1 bg-amber-100 text-black border rounded-md font-semibold">
-                    ⭐ {movie.vote_average?.toFixed(1)}
-                  </span>
-                  <span>{movie.release_date}</span>
-                </div>
               </div>
             </div>
 
-            <div className="p-6">
-              <p className="text-sm leading-relaxed text-neutral-300 line-clamp-4">
+            <div className="px-10 py-8 bg-[#0b0b0b]">
+              
+              {/* Genres Row (Using corrected genresToDisplay) */}
+              <div className="flex flex-wrap gap-2 mb-5">
+                {genresToDisplay.map((name, index) => (
+                  <span 
+                    key={index} 
+                    className="text-[10px] px-3 py-1 rounded-full bg-white/5 border border-white/10 text-yellow-400/80 font-bold uppercase tracking-widest"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+
+              <p className="text-sm leading-relaxed text-neutral-400 line-clamp-3 font-medium opacity-90">
                 {movie.overview}
               </p>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                {/* View Details – Primary */}
+              <div className="mt-8 flex flex-wrap items-center gap-4">
                 <button
                   onClick={() => navigate(`/movie/${movie.id}`)}
-                  className="px-6 py-3 flex gap-2 items-center bg-yellow-400 
-                  rounded-xl hover:bg-yellow-300 transition font-semibold 
-                  text-black shadow-lg"
+                  className="flex-1 min-w-[160px] h-14 flex gap-3 items-center justify-center bg-yellow-400 rounded-2xl hover:bg-yellow-300 transition font-black text-black shadow-xl text-xs uppercase tracking-widest active:scale-95"
                 >
-                  <TbMovie className="text-lg" /> View Details
+                  <TbMovie size={20} /> View Details
                 </button>
 
-                {/* Watchlist */}
-                <div className="bg-white/5 border border-white/10 
-                rounded-xl hover:bg-white/10 transition shadow-md">
+                <div className="h-14 w-14 bg-white/5 border border-white/10 rounded-[14px] flex items-center justify-center transition hover:bg-white/10">
                   <WatchlistButton movie={movie} variant="modal" />
                 </div>
 
-                {/* Write Review */}
                 <button
                   onClick={() => setOpenReview(true)}
-                  className="px-5 py-3 flex items-center gap-2 
-                  bg-white/10 border border-white/20 
-                  rounded-xl text-sm font-medium hover:bg-white/20 
-                  transition text-white"
+                  className="px-6 h-14 flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition text-white/80 active:scale-95"
                 >
-                  ✍ Write Review
+                  ✍ Review
                 </button>
-
               </div>
-              {openReview && (
-                  <ReviewModal
-                    movie={movie}
-                    onClose={() => setOpenReview(false)}
-                  />
-                )}
 
+              {openReview && <ReviewModal movie={movie} onClose={() => setOpenReview(false)} />}
             </div>
           </motion.div>
         </motion.div>

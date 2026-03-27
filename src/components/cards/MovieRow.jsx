@@ -69,7 +69,7 @@ const MovieRow = ({ rowId, title, fetchFn }) => {
             movies.map((movie) => (
               <div
                 key={movie.id}
-                onClick={() => setSelectedMovie(movie)} // Entire card clickable on Mobile
+                onClick={() => setSelectedMovie({ ...movie, isFromTrending: rowId === 'trending' })}
                 className="relative px-3 min-w-[135px] sm:min-w-[170px] md:min-w-[200px] lg:min-w-[250px] snap-start group/card py-2 cursor-pointer"
               >
                 <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a] border border-white/5 transition-all duration-500 group-hover/card:border-green-400/30 shadow-2xl">

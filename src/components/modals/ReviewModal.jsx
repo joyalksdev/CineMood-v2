@@ -9,14 +9,14 @@ const ReviewModal = ({ movie, onClose }) => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
-const submitReview = async () => {
+  const submitReview = async () => {
     if (text.trim().length < 5) return toast.error("Tell us a bit more about the vibe!");
     
     try {
       setLoading(true);
       await addReview({
         movieId: movie.id.toString(),
-        movieTitle: movie.title, // Critical for backend logging
+        movieTitle: movie.title, 
         rating: Number(rating),
         content: text.trim()
       });
@@ -32,12 +32,17 @@ const submitReview = async () => {
   
   return (
     <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 backdrop-blur-xl flex justify-center items-center z-[120] p-4"
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }}
+      // INCREASED Z-INDEX TO 150 TO OVERLAY QUICKVIEW
+      className="fixed inset-0 bg-black/90 backdrop-blur-md flex justify-center items-center z-[150] p-4"
     >
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
-        className="bg-[#0f0f0f] w-full max-w-lg rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden"
+        initial={{ scale: 0.9, y: 20 }} 
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        className="bg-[#0f0f0f] w-full max-w-lg rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
       >
         {/* Header with Backdrop */}
         <div className="relative h-32 w-full overflow-hidden">
@@ -47,7 +52,7 @@ const submitReview = async () => {
             alt=""
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/50 to-transparent" />
-          <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-black/40 hover:bg-white/10 rounded-full transition-colors">
+          <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-black/40 hover:bg-white/10 rounded-full transition-colors z-20">
             <X size={20} className="text-white" />
           </button>
           <div className="absolute bottom-4 left-8">
