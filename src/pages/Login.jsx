@@ -10,6 +10,7 @@ import { useUser } from "../context/UserContext";
 import { FadeLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import api from "../services/axios";
+import Meta from "../components/ui/Meta";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -74,6 +75,8 @@ const Login = () => {
 
   return (
     <>
+    <Meta title="Login" />
+
       <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10">
         {loading ? (
           <div className="flex flex-col items-center justify-center p-10 animate-pulse">

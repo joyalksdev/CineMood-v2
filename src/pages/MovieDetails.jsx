@@ -22,6 +22,7 @@ import GoBackBtn from "../components/ui/GoBackBtn";
 import { Flag } from "lucide-react";
 import ReportModal from "../components/modals/ReportModal";
 import ScrollToTopButton from "../components/ui/ScrollToTopButton";
+import Meta from '../components/ui/Meta'
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -87,6 +88,8 @@ const MovieDetails = () => {
       exit={{ opacity: 0 }}
       className="relative w-full pb-20"
     >
+      <Meta title={movie.title} />
+
       {/* 1. Cinematic Backdrop */}
       <div className="absolute -top-26 left-0 lg:-left-10 w-[100vw] h-[650px] pointer-events-none overflow-hidden">
         <div 

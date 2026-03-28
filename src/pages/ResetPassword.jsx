@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Lock, Eye, EyeOff, ShieldCheck, Loader2 } from 'lucide-react';
+import Meta from '../components/ui/Meta';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -36,6 +37,7 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <Meta title="Reset Password" />
       <div className="w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-10 shadow-2xl">
         
         {/* Header */}

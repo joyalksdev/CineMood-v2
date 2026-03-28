@@ -62,7 +62,7 @@ const MovieRow = ({ rowId, title, fetchFn }) => {
           <ChevronRight size={32} />
         </button>
 
-        <div ref={rowRef} className={`${loading ? 'gap-3' : 'gap-0'} flex gap-1 md:gap-3 overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory`}>
+        <div ref={rowRef} data-lenis-prevent className={`${loading ? 'gap-3' : 'gap-0'} flex gap-1 md:gap-3 overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory`}>
           {loading ? (
             [...Array(8)].map((_, i) => <CardSkelton key={i} />)
           ) : (

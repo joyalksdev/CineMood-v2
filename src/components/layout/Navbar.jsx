@@ -5,7 +5,7 @@ import { HiOutlineSearch, HiOutlineMenuAlt3, HiX } from "react-icons/hi"
 import DropDownProfile from '../ui/DropDownProfile'
 import { useUser } from '../../context/UserContext'
 import SearchBar from '../search/SearchBar'
-import { Bell } from "lucide-react";
+import { Bell, Sparkle } from "lucide-react";
 import { useNotifications } from '../../hooks/useNotifications'
 import NotificationDrawer from '../notification/NotificationDrawer' 
 import NotificationTrigger from '../notification/NotificationTrigger'
@@ -70,75 +70,129 @@ useEffect(() => {
 }, [notifications.length]); // Triggers only when a new notification is added to the list
 
   return (
-    <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-b from-black/90 to-transparent backdrop-blur-md px-10 py-5 flex items-center justify-between text-white">
-
-        <Link to="/home" className="flex items-center gap-3 text-[25px] heading">
-          <img src={logo} alt="Logo" className="h-8" />
-          <h2><span className="text-[#FFC509] font-bold">Cine</span>Mood</h2>
+   <>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black/95 to-transparent backdrop-blur-md px-4 md:px-10 py-4 md:py-5 flex items-center justify-between text-white transition-all">
+        
+        {/* Logo Section - Title visibility fixed for all screens */}
+        <Link to="/home" className="flex items-center gap-2 text-xl md:text-[25px] heading shrink-0">
+          <img src={logo} alt="Logo" className="h-7 md:h-8" />
+          {/* Changed xs:block to sm:block or min-width for better support */}
+          <h2 className="hidden min-[380px]:block">
+            <span className="text-[#FFC509] font-bold">Cine</span>Mood
+          </h2>
         </Link>
 
         <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-     
+        {/* Desktop Links - Kept exactly the same */}
         {!isSearchOpen && (
-          <ul className="hidden lg:flex gap-10">
-            <NavLink to='/home' className={linkStyle} >Home</NavLink>
-            <NavLink to='browse' className={linkStyle} >Browse</NavLink>
-            <NavLink to='watchlist' className={linkStyle} >Watchlist</NavLink>
+          <ul className="hidden lg:flex gap-8 xl:gap-10">
+            <NavLink to='/home' className={linkStyle}>Home</NavLink>
+            <NavLink to='browse' className={linkStyle}>Browse</NavLink>
+            <NavLink to='watchlist' className={linkStyle}>Watchlist</NavLink>
             <NavLink to='ai' className={aiLinkStyle}>VibeSearch</NavLink>
           </ul>
         )}
 
-      
+        {/* Action Group */}
         {!isSearchOpen && (
-          <div className="flex items-center gap-4">
-
-    
-            <button onClick={() => setIsSearchOpen(true)} className="lg:hidden text-2xl">
-              <HiOutlineSearch />
-            </button>
-
-           <button
-            onClick={() => setIsMenuOpen(prev => !prev)}
-            className="lg:hidden text-3xl transition-transform ease-in duration-500"
-            >
-            {isMenuOpen ? <HiX /> : <HiOutlineMenuAlt3 />}
-            </button>
-
-            {user && (
-              <NotificationTrigger 
-                unreadCount={unreadCount} 
-                onClick={() => setIsDrawerOpen(true)} 
-              />
+          <div className="flex items-center gap-2 md:gap-4">
+            
+            {/* Search Toggle - Now STRICTLY mobile only (lg:hidden) */}
+            {!isMenuOpen && (
+              <button 
+                onClick={() => setIsSearchOpen(true)} 
+                className="lg:hidden p-2 text-xl text-neutral-300 hover:text-[#FFC509]"
+              >
+                <HiOutlineSearch />
+              </button>
             )}
 
-            <DropDownProfile />
+            {/* Notification & Profile - Spacing tightened for mobile */}
+            <div className="flex items-center gap-1.5 md:gap-4">
+              {user && (
+                <NotificationTrigger 
+                  unreadCount={unreadCount} 
+                  onClick={() => setIsDrawerOpen(true)} 
+                />
+              )}
+              <DropDownProfile />
+            </div>
+
+            {/* Mobile Menu Toggle - z-index ensures it stays above the overlay */}
+            <button
+              onClick={() => setIsMenuOpen(prev => !prev)}
+              className="lg:hidden p-2 text-2xl md:text-3xl z-50 hover:text-[#FFC509] transition-colors"
+            >
+              {isMenuOpen ? <HiX /> : <HiOutlineMenuAlt3 />}
+            </button>
           </div>
         )}
       </nav>
 
+      <div className={`fixed inset-0 z-[55] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
+        ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+        
+        {/* Dark Glass Overlay */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-3xl" onClick={() => setIsMenuOpen(false)} />
+
+        {/* Content Container */}
+        <div className={`relative h-full flex flex-col items-center justify-center gap-12 transition-all duration-500 delay-100
+          ${isMenuOpen ? "translate-y-0 scale-100" : "translate-y-10 scale-95"}`}>
+          
+          <div className="flex flex-col items-center gap-8 w-full">
+            {[
+              { to: '/home', label: 'Home' },
+              { to: 'browse', label: 'Browse' },
+              { to: 'watchlist', label: 'Watchlist' }
+            ].map((link, i) => (
+              <NavLink 
+                key={link.to}
+                to={link.to} 
+                onClick={() => setIsMenuOpen(false)}
+                style={{ transitionDelay: `${i * 50}ms` }}
+                className={({isActive}) => `text-3xl font-bold tracking-wide transition-all duration-300 ${
+                  isActive ? "text-[#FFC509] scale-110" : "text-white/40 hover:text-white"
+                } ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
+
+          {/* AI VibeSearch Button with Pulsing Glow */}
+          <NavLink 
+            to='ai' 
+            onClick={() => setIsMenuOpen(false)} 
+            className={`relative group px-10 py-5 rounded-3xl bg-black border border-[#FFC509]/30 transition-all duration-500
+              ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            style={{ transitionDelay: '200ms' }}
+          >
+            {/* Animated Glow Backing */}
+            <div className="absolute inset-0 bg-[#FFC509]/20 blur-2xl rounded-full animate-pulse group-hover:bg-[#FFC509]/40 transition-colors" />
+            
+            <span className="relative z-10 text-2xl font-black italic text-[#FFC509] flex items-center gap-3">
+              VibeSearch <span className="animate-pulse"><Sparkle/></span>
+            </span>
+          </NavLink>
+
+          {/* Subtle footer info for mobile menu */}
+          <div className={`absolute bottom-10 text-neutral-600 text-[10px] font-bold uppercase tracking-[0.3em] transition-opacity duration-1000 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}>
+            CineMood AI Engine v3.0
+          </div>
+        </div>
+      </div>
+
+      {/* Notification Drawer - Kept exactly the same */}
       <NotificationDrawer 
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)} 
         notifications={notifications}
         onMarkRead={handleMarkRead} 
         onMarkAllRead={handleMarkAllRead}
-        onRefresh={refresh} // Pass the refresh function
-        loading={loading}   // Pass loading state for the spin animation
+        onRefresh={refresh}
+        loading={loading}
       />
-            
-
-
-      <div className={`fixed inset-0 z-40 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 text-xl transition-all duration-300
-        ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}>
-
-            <NavLink to='/home' onClick={() => setIsMenuOpen(false)} className={linkStyle} >Home</NavLink>
-            <NavLink to='browse' onClick={() => setIsMenuOpen(false)} className={linkStyle} >Browse</NavLink>
-            <NavLink to='watchlist' onClick={() => setIsMenuOpen(false)} className={linkStyle} >Watchlist</NavLink>
-            <NavLink to='ai' onClick={() => setIsMenuOpen(false)} className={aiLinkStyle}>VibeSearch ✨</NavLink>
-
-      </div>
     </>
   )
 }

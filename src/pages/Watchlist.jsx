@@ -7,6 +7,7 @@ import { LucideTrash, BrainCircuit, Sparkles, Lock, CheckCircle2 } from "lucide-
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Meta from "../components/ui/Meta";
 
 const Watchlist = () => {
   const { watchlist, removeFromWatchlist, loading } = useWatchlist();
@@ -19,44 +20,53 @@ const Watchlist = () => {
   const isUnlocked = watchlist.length >= 5;
 
   // Neural Engine One-Time Notification Logic
-  useEffect(() => {
-    if (watchlist.length === 5 && !hasNotified.current) {
-      hasNotified.current = true; // Set ref immediately
-      
-      toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-in fade-in zoom-in-95' : 'animate-out fade-out zoom-out-95'} 
-          max-w-md w-full bg-[#121212] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl pointer-events-auto 
-          flex border border-[#FFC509]/30 backdrop-blur-xl transition-all duration-300`}>
-          <div className="flex-1 w-0 p-4">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 pt-0.5">
-                <BrainCircuit className="h-10 w-10 text-[#FFC509] animate-pulse" />
-              </div>
-              <div className="ml-3 flex-1">
-                <p className="text-sm font-black text-white uppercase tracking-widest">Neural Engine Online</p>
-                <p className="mt-1 text-[11px] text-white/60 leading-relaxed font-medium">
-                  Threshold reached. Your unique **Weekly Spotlight** has been synthesized based on your taste.
-                </p>
-              </div>
+  // Neural Engine One-Time Notification Logic
+useEffect(() => {
+  // Check local storage to see if we already notified for this "session" of being at 5+ movies
+  const alreadyNotified = localStorage.getItem("neural_engine_notified") === "true";
+
+  if (watchlist.length >= 5 && !alreadyNotified) {
+    // Mark as notified in Local Storage immediately
+    localStorage.setItem("neural_engine_notified", "true");
+    
+    toast.custom((t) => (
+      <div className={`${t.visible ? 'animate-in fade-in zoom-in-95' : 'animate-out fade-out zoom-out-95'} 
+        max-w-md w-full bg-[#121212] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl pointer-events-auto 
+        flex border border-[#FFC509]/30 backdrop-blur-xl transition-all duration-300`}>
+        <div className="flex-1 w-0 p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 pt-0.5">
+              <BrainCircuit className="h-10 w-10 text-[#FFC509] animate-pulse" />
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-black text-white uppercase tracking-widest italic">Neural Engine Online</p>
+              <p className="mt-1 text-[11px] text-white/60 leading-relaxed font-medium">
+                Threshold reached. Your unique <span className="text-[#FFC509]">Weekly Spotlight</span> has been synthesized based on your taste.
+              </p>
             </div>
           </div>
-          <div className="flex border-l border-white/10">
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                navigate('/home', { state: { scrollToSpotlight: true } });
-              }}
-              className="w-full border border-transparent rounded-none rounded-r-2xl px-6 flex items-center justify-center text-[10px] font-black tracking-tighter text-[#FFC509] hover:bg-[#FFC509]/5 transition-colors uppercase"
-            >
-              View
-            </button>
-          </div>
         </div>
-      ), { id: 'neural-engine-trigger', duration: 6000 });
-    } else if (watchlist.length < 5) {
-      hasNotified.current = false; // Reset if they remove movies below threshold
-    }
-  }, [watchlist.length, navigate]);
+        <div className="flex border-l border-white/10">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              navigate('/home', { state: { scrollToSpotlight: true } });
+            }}
+            className="w-full px-6 flex items-center justify-center text-[10px] font-black tracking-tighter text-[#FFC509] hover:bg-[#FFC509]/5 transition-colors uppercase italic"
+          >
+            View
+          </button>
+        </div>
+      </div>
+    ), { id: 'neural-engine-trigger', duration: 6000 });
+  } 
+  
+  // If they drop below 5, reset the flag so they get the "hype" again when they hit 5 next time
+  if (watchlist.length < 5 && alreadyNotified) {
+    localStorage.setItem("neural_engine_notified", "false");
+  }
+}, [watchlist.length, navigate]);
+
 
   if (loading) {
     return (
@@ -68,6 +78,7 @@ const Watchlist = () => {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+      <Meta title="Watchlist" />
       <div className="px-8 pb-6 min-h-screen bg-transparent text-white">
         <GoBackBtn />
         
@@ -87,7 +98,7 @@ const Watchlist = () => {
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <BrainCircuit size={16} className={isUnlocked ? "text-[#FFC509]" : "text-white/40"} />
-                <span className="text-[10px] font-black uppercase tracking-widest">Neural Engine</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">AI Neural Engine</span>
               </div>
               <span className="text-[10px] font-bold text-[#FFC509]">{watchlist.length}/5 Movies</span>
             </div>
@@ -103,6 +114,13 @@ const Watchlist = () => {
             <p className="text-[9px] text-white/40 font-medium uppercase tracking-tighter">
               {isUnlocked ? "✨ Spotlight Synthesized" : `Add ${5 - watchlist.length} more to unlock Weekly Spotlight`}
             </p>
+
+            {isUnlocked && (
+              <button onClick={()=> navigate('/home', { state: { scrollToSpotlight: true } })}
+            className="text-[10px] font-bold text-green-400 hover:text-[#FFC509] uppercase duration-300 cursor-pointer"
+            > View Spotlight</button>
+            )}
+            
           </div>
         </header>
 

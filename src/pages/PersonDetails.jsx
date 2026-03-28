@@ -1,107 +1,138 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import userPlaceholder from "../assets/user-placeholder.png"
-import moviePlaceholder from "../assets/m-placeholder.png"
 import { fetchPersonDetails } from '../services/tmbdApi'
 import { FadeLoader } from 'react-spinners'
 import QuickViewModal from '../components/modals/QuickViewModal'
+import MovieGridCard from '../components/cards/MovieGridCard'
 import GoBackBtn from '../components/ui/GoBackBtn'
+import Meta from '../components/ui/Meta'
 
 const PersonDetails = () => {
   const { id } = useParams()
   const [person, setPerson] = useState(null)
+  const [castMovies, setCastMovies] = useState([])
+  const [displayLimit, setDisplayLimit] = useState(12) // Infinite scroll logic
   const [selectedMovie, setSelectedMovie] = useState(null)
-  const navigate = useNavigate()
-  
+  const loaderRef = useRef(null)
+
   useEffect(() => {
-    fetchPersonDetails(id).then(setPerson)
+    fetchPersonDetails(id).then((data) => {
+      setPerson(data)
+      // Sort movies by popularity so their best work shows first
+      const sortedCast = data.movie_credits.cast.sort((a, b) => b.popularity - a.popularity)
+      setCastMovies(sortedCast)
+    })
   }, [id])
 
-   useEffect(() => {
-    setSelectedMovie(null)
-  }, [id])
-  
+  // Infinite Scroll Observer for the filmography
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && person) {
+        setDisplayLimit((prev) => prev + 12)
+      }
+    }, { threshold: 0.1 })
 
-  if (!person) return <div className='p-6 '>
-<FadeLoader
-      className='mx-auto mb-5'
-  color="#FFC509"
-  radius={-5}
-  speedMultiplier={1}
-  width={4}
-  loading />
-</div>
+    if (loaderRef.current) observer.observe(loaderRef.current)
+    return () => observer.disconnect()
+  }, [person])
 
-return (
-  <div className="min-h-screen bg-gradient-to-b rounded-2xl from-neutral-950 via-neutral-900 to-black text-white pb-16 px-6">
-     
-     <div className='p-2'>
-      <GoBackBtn />
-     </div>
+  if (!person) return (
+    <div className='min-h-screen flex items-center justify-center bg-black'>
+      <FadeLoader color="#FFC509" />
+    </div>
+  )
 
-    <div className="max-w-6xl mx-auto bg-white/5 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10">
+  const visibleMovies = castMovies.slice(0, displayLimit)
 
-      <header className="flex flex-col md:flex-row gap-10 items-center md:items-start">
+  return (
+    <div className="min-h-screen bg-black text-white pb-20 px-4 md:px-10">
+      <Meta title={person.name} />
+      
+      {selectedMovie && (
+        <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
+      )}
 
+      <div className='py-6'>
+        <GoBackBtn />
+      </div>
 
-        <div className="relative">
-          <img
-            src={
-              person.profile_path
-                ? `https://image.tmdb.org/t/p/w500${person.profile_path}`
-                : userPlaceholder
-            }
-            className="w-52 h-72 object-cover rounded-2xl shadow-xl"
-          />
-          <span className="absolute bottom-2 right-2 bg-black/70 text-xs px-3 py-1 rounded-full">
-            {person.known_for_department}
-          </span>
-        </div>
-
-
-        <div className="flex-1">
-          <h2 className="text-4xl font-bold leading-tight">
-            {person.name}
-          </h2>
-
-          <div className="flex flex-wrap gap-4 text-sm text-neutral-400 mt-3">
-            <span>🎂 {person.birthday || "N/A"}</span>
-            <span>📍 {person.place_of_birth || "Unknown"}</span>
-            <span>🔥 Popularity: {Math.round(person.popularity)}</span>
+      <div className="max-w-7xl mx-auto">
+        {/* Profile Header Area */}
+        <header className="flex flex-col lg:flex-row gap-12 items-center lg:items-start mb-20">
+          <div className="relative shrink-0">
+            <img
+              src={person.profile_path ? `https://image.tmdb.org/t/p/w500${person.profile_path}` : userPlaceholder}
+              className="w-64 h-80 md:w-72 md:h-96 object-cover rounded-3xl shadow-2xl border border-white/10"
+              alt={person.name}
+            />
+            <div className="absolute -bottom-4 -right-4 bg-[#FFC509] text-black text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full shadow-lg">
+              {person.known_for_department}
+            </div>
           </div>
 
-          <p className="text-neutral-300 mt-6 leading-relaxed max-w-2xl line-clamp-6">
-            {person.biography || "Biography not available."}
-          </p>
-        </div>
-      </header>
+          <div className="flex-1 text-center lg:text-left">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
+              {person.name}
+            </h1>
 
+            <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-xs font-bold tracking-[0.2em] uppercase text-neutral-500 mb-8">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-neutral-600">Born</span>
+                <span className="text-neutral-300">{person.birthday || "Unknown"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-neutral-600">Origin</span>
+                <span className="text-neutral-300 truncate max-w-[200px]">{person.place_of_birth || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-neutral-600">Influence</span>
+                <span className="text-[#FFC509]">{Math.round(person.popularity)} pts</span>
+              </div>
+            </div>
 
-      <div className="border-t border-white/10 my-10"></div>
-
-      <section>
-        <h3 className="text-2xl font-semibold mb-6">Known For</h3>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-          {person.movie_credits.cast.slice(0, 10).map(movie => (
-            <div key={movie.id} className="group cursor-pointer" onClick={() => navigate(`/movie/${movie.id}`)}>
-              <img
-                src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
-                className="rounded-xl group-hover:scale-105 transition"
-              />
-              <p className="text-sm mt-2 opacity-80 truncate">
-                {movie.title || movie.name}
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#FFC509]">Biography</h3>
+              <p className="text-neutral-400 leading-relaxed max-w-3xl text-sm md:text-base font-medium">
+                {person.biography || "No biological data found in the neural archives."}
               </p>
             </div>
-          ))}
-        </div>
-       
-      </section>
+          </div>
+        </header>
 
+        {/* Filmography Section */}
+        <section className="mt-20">
+          <div className="flex items-center gap-4 mb-12">
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight">Known For</h2>
+            <div className="h-[2px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10">
+            {visibleMovies.map((movie) => (
+              <MovieGridCard 
+                key={movie.id} 
+                movie={movie} 
+                onSelectMovie={setSelectedMovie} 
+              />
+            ))}
+          </div>
+
+          {/* Loader for Infinite Scroll */}
+          {displayLimit < castMovies.length && (
+            <div ref={loaderRef} className="flex justify-center py-20">
+              <FadeLoader color="#FFC509" />
+            </div>
+          )}
+
+          {displayLimit >= castMovies.length && castMovies.length > 0 && (
+            <div className="text-center py-20 opacity-20">
+              <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-white">Archives Complete</span>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
-  </div>
-)
-
+  )
 }
 
 export default PersonDetails

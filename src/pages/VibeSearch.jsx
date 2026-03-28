@@ -3,6 +3,7 @@ import { Sparkles, Loader2, X, Search, Star, MessageSquare, Cpu, Database, Finge
 import { getAiRecommendations } from "../services/aiService";
 import moviePlaceholder from "../assets/m-placeholder.png";
 import QuickViewModal from "../components/modals/QuickViewModal";
+import Meta from "../components/ui/Meta";
 
 const VibeSearch = ({ onSelectMovie }) => {
   const [query, setQuery] = useState("");
@@ -95,7 +96,7 @@ const VibeSearch = ({ onSelectMovie }) => {
 
   return (
     <div className="min-h-screen bg-transparent text-white px-4 md:px-6 pt-12 pb-20 relative">
-      
+      <Meta title="AI Vibe Search" />
       {toast && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] bg-neutral-900 border border-white/10 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
           <div className="w-2 h-2 rounded-full bg-[#FFC509] animate-pulse" />

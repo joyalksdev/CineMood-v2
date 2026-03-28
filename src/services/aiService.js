@@ -1,20 +1,21 @@
-import api from './axios'; // Assuming your interceptors are here
+import api from './axios';
 
-// /**
-//  * Calls CineMood AI to get movie recommendations based on a vibe/mood.
-//  * @param {string} moodQuery - The user's input (e.g., "Jackie Chan" or "Oscar winners")
-//  * @param {string} modelName - The Gemini model to use (default: gemini-2.5-flash)
-//  */
-
+/**
+ * AI LOGIC: Sends a user's mood/vibe to the Gemini engine.
+ * Returns a list of movie recommendations.
+ */
 export const getAiRecommendations = async (moodQuery, modelName = "gemini-2.5-flash") => {
   try {
+    // API CALL: Uses 'semantic_search' to tell the backend to process a movie query.
     const response = await api.post('/ai/process', { 
       task: "semantic_search", 
       data: moodQuery,
       model: modelName 
     });
+
     return response.data; 
   } catch (error) {
+    // ERROR LOGIC: Log locally but 'throw' so the UI can show a toast/alert.
     console.error("AI Service Error:", error);
     throw error;
   }

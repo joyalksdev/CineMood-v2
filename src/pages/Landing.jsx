@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import Hero from '../components/sections/Hero'
 import SpotlightCard from '../components/ui/SpotlightCard'
 import { RiShiningFill } from "react-icons/ri";
@@ -9,12 +9,16 @@ import AboutSection from '../components/sections/AboutSection'
 import DeveloperSpotlight from '../components/sections/DeveloperSpotlight' // Import the new section
 
 const Landing = () => {
-  const { user, loading } = useUser()
+  const aboutRef = useRef(null);
+
+  const scrollToAbout = () => {
+    aboutRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <main className='min-h-screen px-4 md:px-10 pt-22 bg-black'>
       {/* Hero Section */}
-      <Hero />
+      <Hero  onAboutClick={scrollToAbout}/>
 
       {/* Feature Cards Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16'>
@@ -59,7 +63,9 @@ const Landing = () => {
       </div>
 
       {/* About Section - Explains the MERN + AI magic */}
-      <AboutSection />
+      <div ref={aboutRef}>
+        <AboutSection  />
+      </div>
 
       {/* Developer Spotlight - Redirects to your contact/socials */}
       <DeveloperSpotlight />

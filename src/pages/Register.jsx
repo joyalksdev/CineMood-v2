@@ -10,6 +10,7 @@ import { useUser } from "../context/UserContext";
 import { FadeLoader } from "react-spinners";
 import { Mail, Lock, UserPlus } from "lucide-react"; // Matching your modern icon style
 import toast from "react-hot-toast";
+import Meta from "../components/ui/Meta";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const Register = () => {
 
   return (
     <>
+    <Meta title="Join" />
       <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10">
         {loading ? (
           <div className="flex flex-col items-center justify-center p-10">

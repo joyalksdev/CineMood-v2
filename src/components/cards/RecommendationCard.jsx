@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fetchPersonalizedMovies } from "../../services/tmbdApi";
 import { useUser } from "../../context/UserContext";
 import QuickViewModal from "../modals/QuickViewModal";
@@ -13,27 +13,35 @@ const RecommendationCard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const rowRef = useRef(null);
+  const userGenres = useMemo(() => user?.genres || [], [user?.genres]);
+  const userLang = user?.language;
 
   useEffect(() => {
     const loadRecommendations = async () => {
-      setLoading(true);
-      if (!user?.genres?.length) {
+      // Don't set loading to true if we already have movies (prevents "flash" on watchlist update)
+      if (movies.length === 0) setLoading(true); 
+      
+      if (!userGenres.length) {
         setMovies([]);
         setLoading(false);
         return;
       }
+
       try {
-        const data = await fetchPersonalizedMovies(user.genres, user.language);
+        const data = await fetchPersonalizedMovies(userGenres, userLang);
         setMovies(data || []);
       } catch (error) {
         console.error("Recommendation fetch failed:", error);
-        setMovies([]);
       } finally {
         setLoading(false);
       }
     };
+
     loadRecommendations();
-  }, [user]);
+    // ONLY re-run if genres or language actually change, 
+    // NOT when the watchlist inside the user object changes.
+  }, [userGenres, userLang]);
+
 
   const scroll = (direction) => {
     if (rowRef.current) {
@@ -72,7 +80,7 @@ const RecommendationCard = () => {
           <ChevronRight size={32} />
         </button>
 
-        <div ref={rowRef} className={`flex ${loading ? 'gap-3' : 'gap-0'} overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory`}>
+        <div ref={rowRef} data-lenis-prevent className={`flex ${loading ? 'gap-3' : 'gap-0'} overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory`}>
           {loading ? (
             [...Array(8)].map((_, i) => <CardSkelton key={i} />)
           ) : (

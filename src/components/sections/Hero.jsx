@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { fetchTrendingMovies } from "../../services/tmbdApi";
+import moviePlaceholder from "../../assets/m-placeholder.png"
 
-export default function Hero() {
+export default function Hero({ onAboutClick }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function Hero() {
           {[...movies, ...movies].map((movie, i) => (
             <img
               key={movie.id + i}
-              src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
+              src={movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : moviePlaceholder}
               className="w-full h-full object-cover rounded-lg"
               alt={movie.title}
               loading="lazy"
@@ -47,13 +48,13 @@ export default function Hero() {
         </div>
 
         <div className="flex flex-col mt-2 sm:flex-row gap-3">
-          <Link to="/Browse">
+          <Link to="/browse">
             <button className="px-5 py-2 bg-[#FFC509] text-black font-medium rounded-lg hover:bg-amber-300 cursor-pointer hover:shadow-xl shadow-amber-300/10 transition-all">
               Start Exploring
             </button>
           </Link>
-          <button className="px-5 py-2 border border-[#FFC509] text-[#FFC509] font-medium rounded-lg backdrop-blur-sm cursor-pointer hover:shadow-xl shadow-amber-300/10 transition-all ease-linear">
-            Browse Trending
+          <button onClick={onAboutClick} className="px-5 py-2 border border-[#FFC509] text-[#FFC509] font-medium rounded-lg backdrop-blur-sm cursor-pointer hover:shadow-xl shadow-amber-300/10 transition-all ease-linear">
+           About Cinemood
           </button>
         </div>
       </div>

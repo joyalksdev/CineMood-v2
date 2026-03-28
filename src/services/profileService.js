@@ -10,10 +10,16 @@ export const saveUserProfile = async (profileData) => {
 export const getUserProfile = async () => {
   try {
     const response = await api.get("/profile/me");
-    console.log(`Responded: with ${response}`)
     return response.data;
   } catch (err) {
     console.error("Error fetching user profile:", err);
     return null;
   }
+};
+
+// Permanently deletes the account from MongoDB
+export const deleteUserAccount = async (password) => {
+  // We use the 'data' property in Axios delete requests to send a body
+  const response = await api.delete("/profile/delete", { data: { password } });
+  return response.data;
 };

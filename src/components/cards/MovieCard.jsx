@@ -62,7 +62,7 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
 
       {/* Row Container */}
       <div 
-        ref={rowRef} 
+        ref={rowRef} data-lenis-prevent 
         className="flex gap-5 md:gap-7 overflow-x-auto scrollbar-hide px-4 md:px-10 py-4 snap-x"
       >
         {loading ? (

@@ -157,7 +157,7 @@ const AdminUsersList = () => {
       {/* Table Section */}
       <div className="bg-[#0A0A0A] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left min-w-[800px]">
+          <table data-lenis-prevent className="w-full text-left min-w-[800px]">
             <thead>
               <tr className="bg-white/[0.02] border-b border-white/5 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
                 <th className="px-8 py-5">User Profile</th>

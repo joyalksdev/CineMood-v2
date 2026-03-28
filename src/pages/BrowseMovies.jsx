@@ -7,6 +7,7 @@ import FilterBar from '../components/search/FilterBar'
 // Import the specific Grid Card component to avoid prop-mismatch errors
 import MovieGridCard from '../components/cards/MovieGridCard' 
 import ScrollToTopButton from '../components/ui/ScrollToTopButton'
+import  Meta  from '../components/ui/Meta'
 
 const BrowseMovies = () => {
   const [movies, setMovies] = useState([])
@@ -57,6 +58,9 @@ const BrowseMovies = () => {
 
   return (
     <div className="px-6 min-h-screen bg-transparent">
+      
+      <Meta title="Explore" />
+
       {selectedMovie && (
         <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
       )}

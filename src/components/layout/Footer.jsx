@@ -69,7 +69,10 @@ const Footer = () => {
         <p>&copy; 2026 CineMood. All rights reserved.</p>
         <div className='flex gap-6'>
           <span>Status: Operational</span>
-          <span>v2.0.4</span>
+          <div className='flex gap-1 items-center'>
+            <span>v2.0.4</span>
+            <div className="w-1 h-1 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_#05df72]" />
+          </div>
         </div>
       </div>
     </footer>

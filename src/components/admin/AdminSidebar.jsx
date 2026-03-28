@@ -47,9 +47,12 @@ const AdminSidebar = () => {
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-6 z-[70]">
         <div className="flex items-center gap-2">
           <img src={logo} alt="Logo" className="h-6" />
-          <span className="text-white font-bold italic text-sm tracking-tighter">
-            CINE<span className="text-[#FFC509]">MOOD</span>
-          </span>
+          <div>
+            <h2 className="text-white font-bold text-lg leading-tight tracking-tight">
+              Cine<span className="text-[#FFC509]">Mood</span>
+            </h2>
+            <p className="text-[8px] uppercase tracking-[0.4em] text-neutral-600 font-black">Admin panel</p>
+          </div>
         </div>
         <button 
           onClick={() => setIsOpen(!isOpen)}
