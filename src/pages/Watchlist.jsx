@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Meta from "../components/ui/Meta";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 
 const Watchlist = () => {
   const { watchlist, removeFromWatchlist, loading } = useWatchlist();
@@ -158,6 +159,7 @@ useEffect(() => {
           {selectedMovie && <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />}
         </AnimatePresence>
       </div>
+      <ScrollToTopButton />
     </motion.div>
   );
 };

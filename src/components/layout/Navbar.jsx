@@ -73,10 +73,9 @@ useEffect(() => {
    <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black/95 to-transparent backdrop-blur-md px-4 md:px-10 py-4 md:py-5 flex items-center justify-between text-white transition-all">
         
-        {/* Logo Section - Title visibility fixed for all screens */}
         <Link to="/home" className="flex items-center gap-2 text-xl md:text-[25px] heading shrink-0">
           <img src={logo} alt="Logo" className="h-7 md:h-8" />
-          {/* Changed xs:block to sm:block or min-width for better support */}
+
           <h2 className="hidden min-[380px]:block">
             <span className="text-[#FFC509] font-bold">Cine</span>Mood
           </h2>
@@ -84,7 +83,6 @@ useEffect(() => {
 
         <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-        {/* Desktop Links - Kept exactly the same */}
         {!isSearchOpen && (
           <ul className="hidden lg:flex gap-8 xl:gap-10">
             <NavLink to='/home' className={linkStyle}>Home</NavLink>
@@ -94,11 +92,11 @@ useEffect(() => {
           </ul>
         )}
 
-        {/* Action Group */}
+       
         {!isSearchOpen && (
           <div className="flex items-center gap-2 md:gap-4">
             
-            {/* Search Toggle - Now STRICTLY mobile only (lg:hidden) */}
+            
             {!isMenuOpen && (
               <button 
                 onClick={() => setIsSearchOpen(true)} 
@@ -108,7 +106,7 @@ useEffect(() => {
               </button>
             )}
 
-            {/* Notification & Profile - Spacing tightened for mobile */}
+          
             <div className="flex items-center gap-1.5 md:gap-4">
               {user && (
                 <NotificationTrigger 
@@ -119,7 +117,7 @@ useEffect(() => {
               <DropDownProfile />
             </div>
 
-            {/* Mobile Menu Toggle - z-index ensures it stays above the overlay */}
+           
             <button
               onClick={() => setIsMenuOpen(prev => !prev)}
               className="lg:hidden p-2 text-2xl md:text-3xl z-50 hover:text-[#FFC509] transition-colors"
@@ -130,17 +128,27 @@ useEffect(() => {
         )}
       </nav>
 
-      <div className={`fixed inset-0 z-[55] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
+      <div className={`fixed inset-0 z-[60] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]
         ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
         
-        {/* Dark Glass Overlay */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-3xl" onClick={() => setIsMenuOpen(false)} />
+     
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" onClick={() => setIsMenuOpen(false)} />
 
-        {/* Content Container */}
-        <div className={`relative h-full flex flex-col items-center justify-center gap-12 transition-all duration-500 delay-100
-          ${isMenuOpen ? "translate-y-0 scale-100" : "translate-y-10 scale-95"}`}>
+   
+        <button 
+          onClick={() => setIsMenuOpen(false)}
+          className={`absolute top-6 right-6 z-[70] p-3 rounded-full bg-white/5 border border-white/10 text-white transition-all duration-500 hover:bg-white/10 hover:rotate-90
+            ${isMenuOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}
+        >
+          <HiX size={24} />
+        </button>
+
+      
+        <div className={`relative h-full flex flex-col items-center justify-center gap-16 transition-all duration-500
+          ${isMenuOpen ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"}`}>
           
-          <div className="flex flex-col items-center gap-8 w-full">
+         
+          <div className="flex flex-col items-center gap-10 w-full">
             {[
               { to: '/home', label: 'Home' },
               { to: 'browse', label: 'Browse' },
@@ -150,40 +158,43 @@ useEffect(() => {
                 key={link.to}
                 to={link.to} 
                 onClick={() => setIsMenuOpen(false)}
-                style={{ transitionDelay: `${i * 50}ms` }}
-                className={({isActive}) => `text-3xl font-bold tracking-wide transition-all duration-300 ${
-                  isActive ? "text-[#FFC509] scale-110" : "text-white/40 hover:text-white"
-                } ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                className={({isActive}) => `text-3xl font-bold tracking-tighter transition-all duration-300 ${
+                  isActive ? "text-[#FFC509] scale-110" : "text-white/30 hover:text-white"
+                }`}
               >
                 {link.label}
               </NavLink>
             ))}
           </div>
 
-          {/* AI VibeSearch Button with Pulsing Glow */}
+       
           <NavLink 
             to='ai' 
             onClick={() => setIsMenuOpen(false)} 
-            className={`relative group px-10 py-5 rounded-3xl bg-black border border-[#FFC509]/30 transition-all duration-500
-              ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: '200ms' }}
+            className="relative group p-[2px] rounded-2xl transition-all duration-500 hover:scale-105 active:scale-95"
           >
-            {/* Animated Glow Backing */}
-            <div className="absolute inset-0 bg-[#FFC509]/20 blur-2xl rounded-full animate-pulse group-hover:bg-[#FFC509]/40 transition-colors" />
             
-            <span className="relative z-10 text-2xl font-black italic text-[#FFC509] flex items-center gap-3">
-              VibeSearch <span className="animate-pulse"><Sparkle/></span>
-            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-[#FFC509] to-orange-600 rounded-2xl blur-md opacity-50 group-hover:opacity-100 animate-pulse" />
+            
+            <div className="relative px-12 py-5 rounded-2xl bg-black flex items-center gap-4 border border-white/10">
+              <div className="relative">
+                <Sparkle className="text-[#FFC509] animate-bounce" size={24} />
+                <div className="absolute inset-0 bg-[#FFC509] blur-lg opacity-40 animate-pulse" />
+              </div>
+              
+              <span className="text-2xl font-black italic tracking-tight bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                VibeSearch
+              </span>
+            </div>
           </NavLink>
 
-          {/* Subtle footer info for mobile menu */}
-          <div className={`absolute bottom-10 text-neutral-600 text-[10px] font-bold uppercase tracking-[0.3em] transition-opacity duration-1000 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}>
-            CineMood AI Engine v3.0
+       
+          <div className="absolute bottom-10 text-neutral-700 text-[10px] font-black uppercase tracking-[0.5em]">
+            CineMood System v2.0.4
           </div>
         </div>
       </div>
 
-      {/* Notification Drawer - Kept exactly the same */}
       <NotificationDrawer 
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)} 

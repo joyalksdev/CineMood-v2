@@ -14,6 +14,7 @@ import { Search, ArrowLeft } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import GoBackBtn from "../components/ui/GoBackBtn"
 import QuickViewModal from "../components/modals/QuickViewModal"
+import ScrollToTopButton from "../components/ui/ScrollToTopButton"
 
 const API_MAP = {
   now_playing: fetchNowPlayingMovies,
@@ -113,6 +114,7 @@ const MovieRowPage = () => {
           )}
         </>
       )}
+      <ScrollToTopButton />
     </div>
   )
 }

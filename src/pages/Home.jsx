@@ -14,6 +14,7 @@ import MoodMatcher from "../components/sections/MoodMatcher";
 import { motion } from 'framer-motion';
 import WeeklySpotlight from "../components/sections/WeeklySpotlight";
 import { ShieldCheck, Sparkles } from "lucide-react";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 const floatingIcons = ["🎬", "🍿", "⭐️", "🎥", "🎞️", "📺"];
 
 const Home = () => {
@@ -154,6 +155,7 @@ const Home = () => {
           />
         </div>
       </section>
+      <ScrollToTopButton />
     </div>
   );
 };

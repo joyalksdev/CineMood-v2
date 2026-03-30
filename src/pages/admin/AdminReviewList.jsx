@@ -31,7 +31,7 @@ const AdminReviewList = () => {
 
   const handleDismiss = async (id) => {
   try {
-    await api.put(`/admin/reviews/${id}/dismiss`);
+    await api.put(`/reviews/${id}/dismiss`);
     toast.success("Reports cleared");
     // Update local state so the red/orange UI disappears immediately
     setReviews(reviews.map(r => r._id === id ? { ...r, isFlagged: false, reportCount: 0 } : r));

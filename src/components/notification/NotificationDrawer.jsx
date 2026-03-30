@@ -17,6 +17,25 @@ const NotificationDrawer = ({ isOpen, onClose, notifications, onMarkRead, onMark
     }
   };
 
+const formatNotificationDate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  // Normalize both to midnight to count calendar days accurately
+  const diffInMs = new Date(now).setHours(0,0,0,0) - new Date(date).setHours(0,0,0,0);
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+  // 1. TODAY: Show the specific time (e.g., 4:30 PM)
+  if (diffInDays === 0) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  // 2. YESTERDAY: Show the string
+  if (diffInDays === 1) {
+    return "Yesterday";
+  }
+  // 3. OLDER: Show the month and day (e.g., Mar 28)
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+};
+
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -95,8 +114,8 @@ const NotificationDrawer = ({ isOpen, onClose, notifications, onMarkRead, onMark
                         </p>
                         
                         <div className="flex items-center justify-between pt-3">
-                           <span className="text-[10px] text-neutral-600 font-medium">
-                            {new Date(n.scheduledAt || n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                           <span className={`text-[10px] ${(new Date() - new Date(n.createdAt)) < 24 * 60 * 60 * 1000 ? "text-[#FFC509]" : "text-neutral-700"} font-medium`}>
+                            {formatNotificationDate(n.scheduledAt || n.createdAt)}
                           </span>
 
                           {!n.isRead && (

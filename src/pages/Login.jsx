@@ -11,6 +11,7 @@ import { FadeLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import api from "../services/axios";
 import Meta from "../components/ui/Meta";
+import { Info } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -133,7 +134,7 @@ const Login = () => {
                     className="px-5 border border-neutral-800 bg-neutral-900/50 py-4 rounded-2xl outline-none focus:border-[#FFC509] text-white transition-all placeholder:text-neutral-700"
                     placeholder="Email Address"
                   />
-                  {errors.email && <p className="text-red-500 text-[9px] uppercase font-black ml-3 mt-1">{errors.email.message}</p>}
+                  {errors.email && <p className="text-red-500 text-[12px] font-medium ml-3 mt-1 flex items-center gap-1"> <Info size={13}/> {errors.email.message}</p>}
                 </div>
 
                 <div className="flex flex-col gap-1">
@@ -143,16 +144,16 @@ const Login = () => {
                     className="px-5 border border-neutral-800 bg-neutral-900/50 py-4 rounded-2xl outline-none focus:border-[#FFC509] text-white transition-all placeholder:text-neutral-700"
                     placeholder="Password"
                   />
+                    {errors.password && <p className="text-red-500 text-[12px] font-medium ml-3 mt-1 flex items-center gap-1"> <Info size={13}/> {errors.password.message}</p>}
                   <div className="flex justify-end mt-1">
                      <button 
                        type="button"
                        onClick={switchToForgotMode} // Triggers the sync logic
-                       className="text-[10px] font-black uppercase tracking-tighter text-neutral-500 hover:text-[#FFC509] transition underline-offset-4 hover:underline"
+                       className="text-[10px] font-bold uppercase tracking-wide text-neutral-500 hover:text-[#FFC509] transition underline-offset-4 hover:underline"
                      >
                        Forgot password?
                      </button>
                   </div>
-                  {errors.password && <p className="text-red-500 text-[9px] uppercase font-black ml-3 mt-1">{errors.password.message}</p>}
                 </div>
 
                 <div className="flex items-center gap-3 mb-2 ml-1">

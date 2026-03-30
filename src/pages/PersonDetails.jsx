@@ -7,6 +7,7 @@ import QuickViewModal from '../components/modals/QuickViewModal'
 import MovieGridCard from '../components/cards/MovieGridCard'
 import GoBackBtn from '../components/ui/GoBackBtn'
 import Meta from '../components/ui/Meta'
+import ScrollToTopButton from '../components/ui/ScrollToTopButton'
 
 const PersonDetails = () => {
   const { id } = useParams()
@@ -131,6 +132,7 @@ const PersonDetails = () => {
           )}
         </section>
       </div>
+      <ScrollToTopButton />
     </div>
   )
 }
