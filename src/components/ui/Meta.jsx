@@ -1,14 +1,18 @@
 import { Helmet } from 'react-helmet-async';
 
-const Meta = ({ title }) => {
+const Meta = ({ title , customTitle=null }) => {
   const siteName = "CineMood";
   
-  // If no title is passed, it falls back to the default
   const fullTitle = title ? `${siteName} • ${title}` : `${siteName} • Neural Discovery`;
+  
+    const displayTitle = customTitle 
+      ? customTitle 
+      : fullTitle
+    
 
   return (
     <Helmet>
-      <title>{fullTitle}</title>
+      <title>{displayTitle}</title>
     </Helmet>
   );
 };

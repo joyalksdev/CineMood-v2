@@ -10,7 +10,7 @@ import { HelmetProvider } from "react-helmet-async";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      {/* CONTEXT WRAPPER LOGIC:
+      {/*
           - UserProvider: Manages the global login state (JWT check, profile).
           - WatchlistProvider: Keeps the movie collection in sync across all components.
           - HelmetProvider: Handles dynamic <head> tags for SEO and page titles.

@@ -19,7 +19,6 @@ import MovieReviews from "./pages/MovieReviews";
 import MoodResults from "./pages/MoodResults";
 import { Toaster } from "react-hot-toast";
 import MovieRowPage from "./pages/MovieRowPage";
-import ForgotPassword from "./pages/ForgotPassword";
 import GuestRoute from "./routes/GuestRoute"; 
 import Lenis from "@studio-freight/lenis";
 import { useEffect } from "react";
@@ -165,7 +164,6 @@ const App = () => {
           <Route element={<GuestRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/forgot" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Route>
         </Route>

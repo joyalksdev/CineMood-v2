@@ -60,7 +60,7 @@ const AdminReviewList = () => {
       toast.error("Could not delete review");
     } finally {
       setIsDeleting(false);
-      setSelectedReviewId(null);
+      setSelectedReviewId(null);  
     }
   };
 

@@ -104,7 +104,7 @@ const SearchBar = ({ isOpen, onClose }) => {
                         </span>
                         {/* Fixed Visibility Rating */}
                         <span className="text-xs text-[#FFC509] font-bold flex items-center gap-1">
-                          <Star size={11} fill="#FFC509" /> {movie.vote_average?.toFixed(1)}
+                          <Star size={11} fill="#FFC509" /> {movie.rating.toFixed(1)}
                         </span>
                       </div>
                     </div>

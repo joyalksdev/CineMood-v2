@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import WatchlistButton from "../ui/WatchlistButton";
 import mHPlaceholder from "../../assets/m-h-placeholder.png";
 import ReviewModal from "./ReviewModal";
+import { Star } from "lucide-react";
 
 const QuickViewModal = ({ movie, onClose }) => {
   const modalRef = useRef();
@@ -15,7 +16,7 @@ const QuickViewModal = ({ movie, onClose }) => {
   const backdrop = movie.backdrop_path?.trim();
   
   // 1. Use 'rating' if 'vote_average' doesn't exist (Matches your console log)
-  const displayRating = movie.rating || movie.vote_average || 0;
+  const displayRating = movie.rating.toFixed(1) || movie.vote_average .toFixed(1)|| 0;
   
   // 2. Adjust Trending logic: If popularity is missing, use a fallback or lower threshold
   const isTrending = movie.popularity > 500 || movie.media_type === "movie"; 
@@ -73,7 +74,11 @@ const QuickViewModal = ({ movie, onClose }) => {
 
               <div className="absolute bottom-0 left-10 right-10">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {/* Trending Badge (Adjusted threshold) */}
+                  <span className="text-xs text-[#FFC509] font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-lg">
+                    <Star fill="#FFC509" size={13} /> {displayRating}
+                  </span>
+
+                  {/* Trending Badge*/}
                   {isTrending && (
                     <span className="bg-[#FFC509] text-black text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-tighter shadow-xl">
                       Trending

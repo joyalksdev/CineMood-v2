@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import WeeklySpotlight from "../components/sections/WeeklySpotlight";
 import { ShieldCheck, Sparkles } from "lucide-react";
 import ScrollToTopButton from "../components/ui/ScrollToTopButton";
+import Meta from "../components/ui/Meta";
 const floatingIcons = ["🎬", "🍿", "⭐️", "🎥", "🎞️", "📺"];
 
 const Home = () => {
@@ -22,11 +23,12 @@ const Home = () => {
 
   return (
     <div className="px-6 lg:px-10 pb-20">
-      {/* 1. Cinematic Greeting Section */}
+      <Meta customTitle="CineMood ✦ Discover" />
+      
       <div className="px-6 lg:px-10 pb-20 overflow-hidden">
         {/* 1. Cinematic Greeting Section */}
         <div className="relative flex flex-col justify-center items-center py-20 md:py-28 gap-4 min-h-[40vh]">
-          {/* Floating Background Elements */}
+          {/* Floating Background Items*/}
           {floatingIcons.map((emoji, i) => (
             <motion.span
               key={i}
@@ -73,7 +75,7 @@ const Home = () => {
             )}
           </motion.div>
 
-          {/* Staggered Text Reveal */}
+          {/* Text Reveal */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -108,9 +110,7 @@ const Home = () => {
         </div>
 
         {/* 2. Main Content Sections */}
-        <section className="flex flex-col gap-16">
-          {/* ... Rest of your components */}
-        </section>
+       
       </div>
 
       {/* 2. Main Content Sections */}

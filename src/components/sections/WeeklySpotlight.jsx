@@ -189,7 +189,7 @@ const WeeklySpotlight = () => {
                   <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/5">
                     <Sparkles className="text-[#FFC509]" size={10} />
                     <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">
-                      Neural Engine v2.5
+                      AI Neural Engine v2.5
                     </span>
                   </div>
                 </div>

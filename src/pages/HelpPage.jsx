@@ -169,7 +169,7 @@ const HelpPage = () => {
             </form>
             
             <p className="mt-8 text-[9px] text-white/20 text-center uppercase tracking-[0.3em] font-black">
-              CineMood Neural Support v2.4.0
+              CineMood Support
             </p>
           </div>
         </div>

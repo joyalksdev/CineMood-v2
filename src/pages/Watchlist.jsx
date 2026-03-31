@@ -9,10 +9,13 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Meta from "../components/ui/Meta";
 import ScrollToTopButton from "../components/ui/ScrollToTopButton";
+import DeleteModal from "../components/modals/DeleteModal";
 
 const Watchlist = () => {
   const { watchlist, removeFromWatchlist, loading } = useWatchlist();
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [openDeleteModal, setOpenDeleteModal ] = useState(false)
+  const [movieToDelete, setMovieToDelete] = useState(null);
   const [hoveredId, setHoveredId] = useState(null); 
   const hasNotified = useRef(false); // Ref prevents double-triggering in StrictMode
   const navigate = useNavigate();
@@ -139,9 +142,22 @@ useEffect(() => {
                 <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} key={movie.id} className="group relative">
                   <div className="relative overflow-hidden rounded-2xl aspect-[2/3] bg-white/5 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-[#FFC509]/50 cursor-pointer" onClick={() => setSelectedMovie(movie)}>
                     <img src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={movie.title} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setMovieToDelete(movie); 
+                            setOpenDeleteModal(true); 
+                        }}
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 md:hidden flex items-center gap-2 bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-white font-bold text-xs">
+                        <LucideTrash size={14} /> REMOVE
+                      </button>
+                    <div className="absolute hidden md:block inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <button
-                        onClick={(e) => { e.stopPropagation(); removeFromWatchlist(movie.id); }}
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setMovieToDelete(movie); 
+                            setOpenDeleteModal(true); 
+                        }}
                         className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-white font-bold text-xs"
                       >
                         <LucideTrash size={14} /> REMOVE
@@ -160,6 +176,22 @@ useEffect(() => {
         </AnimatePresence>
       </div>
       <ScrollToTopButton />
+      <DeleteModal
+        isOpen={openDeleteModal}
+        onCancel={() => {
+          setOpenDeleteModal(false);
+          setMovieToDelete(null); // Clear selection on cancel
+        }}
+        onConfirm={() => {
+          removeFromWatchlist(movieToDelete.id); // Use the ID from state
+          setOpenDeleteModal(false);
+          setMovieToDelete(null);
+          toast.success("Removed from watchlist");
+        }}
+        title="Remove Movie?"
+        message={`Are you sure you want to remove "${movieToDelete?.title}" from your Watchlist?`}
+        confirmText="Delete Movie"
+      />
     </motion.div>
   );
 };
