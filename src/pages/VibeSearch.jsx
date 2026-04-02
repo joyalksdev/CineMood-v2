@@ -15,13 +15,12 @@ const VibeSearch = ({ onSelectMovie }) => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [selectedMovie, setSelectedMovie] = useState(null);
   
-  // Ref for AbortController to cancel API calls
   const abortControllerRef = useRef(null);
 
   const suggestions = [
     "Rainy Kochi Nights",
-  "Cyberpunk Dreams",
-  "90s Golden Era"
+    "Cyberpunk Dreams",
+    "90s Golden Era"
   ];
 
   const loadingSteps = [
@@ -49,6 +48,7 @@ const VibeSearch = ({ onSelectMovie }) => {
       abortControllerRef.current.abort();
       setIsLoading(false);
       setToast("Neural link severed. Generation cancelled.");
+      setTimeout(() => setToast(null), 3000);
     }
   };
 
@@ -57,7 +57,6 @@ const VibeSearch = ({ onSelectMovie }) => {
     const searchQuery = overrideQuery || query;
     if (!searchQuery.trim()) return;
 
-    // Set query if coming from suggestion pills
     if (overrideQuery) setQuery(overrideQuery);
 
     setIsLoading(true);
@@ -65,11 +64,9 @@ const VibeSearch = ({ onSelectMovie }) => {
     setResults([]);
     setReason("");
 
-    // Initialize new AbortController
     abortControllerRef.current = new AbortController();
 
     try {
-      // Pass the signal to your service
       const data = await getAiRecommendations(
         searchQuery, 
         "gemini-1.5-flash", 
@@ -78,8 +75,9 @@ const VibeSearch = ({ onSelectMovie }) => {
       );
 
       if (data.success) {
-        setResults(data.movies);
+        setResults(data.movies || []);
         setReason(data.reason);
+        if (data.movies.length === 0) setError("no_results");
       } else if (data.status === 429) {
         setError("limit");
       }
@@ -88,6 +86,7 @@ const VibeSearch = ({ onSelectMovie }) => {
         console.log("Request cancelled by user");
       } else {
         setToast("Connection sluggish. Trying again...");
+        setTimeout(() => setToast(null), 3000);
       }
     } finally {
       setIsLoading(false);
@@ -97,6 +96,7 @@ const VibeSearch = ({ onSelectMovie }) => {
   return (
     <div className="min-h-screen bg-transparent text-white px-4 md:px-6 pt-12 pb-20 relative">
       <Meta title="AI Vibe Search" />
+      
       {toast && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] bg-neutral-900 border border-white/10 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
           <div className="w-2 h-2 rounded-full bg-[#FFC509] animate-pulse" />
@@ -148,7 +148,7 @@ const VibeSearch = ({ onSelectMovie }) => {
                 <>
                   {query && (
                     <button
-                      onClick={() => { setQuery(""); setResults([]); setReason(""); }}
+                      onClick={() => { setQuery(""); setResults([]); setReason(""); setError(null); }}
                       type="button"
                       className="p-2 text-white/20 hover:text-white transition-colors rounded-lg hover:bg-white/5"
                     >
@@ -168,7 +168,7 @@ const VibeSearch = ({ onSelectMovie }) => {
         </form>
 
         {/* Suggestion Pills */}
-        {!isLoading && results.length === 0 && (
+        {!isLoading && results.length === 0 && !error && (
           <div className="flex flex-wrap justify-center gap-2 animate-in fade-in slide-in-from-top-2 duration-700">
             {suggestions.map((s) => (
               <button
@@ -196,6 +196,14 @@ const VibeSearch = ({ onSelectMovie }) => {
           </div>
         )}
 
+        {/* Error Handling */}
+        {error === "no_results" && !isLoading && (
+          <div className="mt-8 flex flex-col items-center text-white/40 gap-2">
+            <AlertCircle size={24} />
+            <p className="text-sm">No matches found in the current neural map. Try a different vibe.</p>
+          </div>
+        )}
+
         {/* Neural Insight */}
         {reason && !isLoading && (
           <div className="mt-8 p-6 bg-white/[0.03] border-l-2 border-[#FFC509]/50 text-left rounded-r-2xl animate-in fade-in slide-in-from-left-4">
@@ -211,12 +219,11 @@ const VibeSearch = ({ onSelectMovie }) => {
       {/* Results Grid */}
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {results.map((movie, index) => {
-          // ADD THIS CHECK: Skip rendering if movie data is missing
           if (!movie) return null;
 
           return (
             <div
-              key={movie.id || index} // Fallback to index if ID is missing
+              key={movie.id || index}
               onClick={() => setSelectedMovie(movie)}
               className="group cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
               style={{ animationDelay: `${index * 70}ms` }}
@@ -226,6 +233,7 @@ const VibeSearch = ({ onSelectMovie }) => {
                   src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={movie.title || "Movie Poster"}
+                  loading="lazy"
                 />
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
@@ -247,6 +255,7 @@ const VibeSearch = ({ onSelectMovie }) => {
           );
         })}
       </div>
+
       {selectedMovie && (
         <QuickViewModal 
           movie={selectedMovie} 

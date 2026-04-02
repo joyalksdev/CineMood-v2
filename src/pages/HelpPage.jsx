@@ -19,6 +19,7 @@ const HelpPage = () => {
   const [status, setStatus] = useState("idle");
   const [activeFaq, setActiveFaq] = useState(null);
 
+  // faq data array
   const faqs = [
     {
       question: "How does the AI recommendation work?",
@@ -37,6 +38,7 @@ const HelpPage = () => {
     }
   ];
 
+  // handle support form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("sending");
@@ -45,6 +47,7 @@ const HelpPage = () => {
       if (data.success) {
         setStatus("success");
         toast.success("Transmission Received 🚀");
+        // reset form after success
         setTimeout(() => {
           setStatus("idle");
           setFormData({ name: "", email: "", message: "" });
@@ -60,7 +63,7 @@ const HelpPage = () => {
     <div className="min-h-screen bg-black text-white pt-28 pb-20 px-6">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
         
-        {/* Left Side: FAQs & Info */}
+        {/* left side: info and faqs */}
         <div className="space-y-12">
           <header className="space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC509]/10 border border-[#FFC509]/20">
@@ -76,6 +79,7 @@ const HelpPage = () => {
             </p>
           </header>
 
+          {/* accordion for faqs */}
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <div 
@@ -107,7 +111,7 @@ const HelpPage = () => {
           </div>
         </div>
 
-        {/* Right Side: Contact Form */}
+        {/* right side: contact form with glow effect */}
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-[#FFC509] to-amber-600 rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000" />
           
@@ -117,13 +121,14 @@ const HelpPage = () => {
                 <Mail size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-black tracking-tight uppercase">Direct Signal</h3>
+                <h3 className="text-2xl font-bold tracking-tight">Direct Message</h3>
                 <p className="text-[10px] text-white/30 font-bold tracking-widest uppercase">Response time: ~24hrs</p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* name input */}
                 <div className="relative">
                   <User size={16} className="absolute left-4 top-4 text-white/20" />
                   <input
@@ -135,6 +140,7 @@ const HelpPage = () => {
                     className="w-full bg-white/5 border border-white/5 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-white focus:outline-none focus:border-[#FFC509]/40 transition-all placeholder:text-white/20"
                   />
                 </div>
+                {/* email input */}
                 <div className="relative">
                   <Mail size={16} className="absolute left-4 top-4 text-white/20" />
                   <input
@@ -148,15 +154,17 @@ const HelpPage = () => {
                 </div>
               </div>
 
+              {/* message text area */}
               <textarea
                 required
                 rows="6"
-                placeholder="How can joyalksdev help you today?"
+                placeholder="How can we help you today?"
                 value={formData.message}
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
                 className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-[#FFC509]/40 transition-all resize-none placeholder:text-white/20"
               />
 
+              {/* submit button with loading states */}
               <button
                 type="submit"
                 disabled={status !== "idle"}

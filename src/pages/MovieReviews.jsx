@@ -5,11 +5,11 @@ import { fetchMovieDetails, fetchMovieReviews } from "../services/tmbdApi";
 import GoBackBtn from "../components/ui/GoBackBtn";
 import ReviewModal from "../components/modals/ReviewModal";
 import FullReviewModal from "../components/modals/FullReviewModal";
-import ReportModal from "../components/modals/ReportModal"; // Import your Report Modal
+import ReportModal from "../components/modals/ReportModal"; 
 import { useReviews } from "../services/useReviews";
 import { IoStar, IoCreateOutline } from "react-icons/io5";
 import { RiDoubleQuotesL } from "react-icons/ri";
-import { Flag } from "lucide-react"; // For the report icon
+import { Flag } from "lucide-react"; 
 import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 
 const MovieReviews = () => {
@@ -17,10 +17,11 @@ const MovieReviews = () => {
   const [movie, setMovie] = useState(null);
   const [openPostModal, setOpenPostModal] = useState(false);
   const [selectedFullReview, setSelectedFullReview] = useState(null);
-  const [reportingReview, setReportingReview] = useState(null); // State for reporting
+  const [reportingReview, setReportingReview] = useState(null); 
   const [tmdbReviews, setTmdbReviews] = useState([]);
 
   useEffect(() => {
+    // fetch data and reset scroll
     fetchMovieDetails(id).then(setMovie);
     fetchMovieReviews(id, 1).then(data => setTmdbReviews(data.results || []));
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -28,7 +29,7 @@ const MovieReviews = () => {
 
   const { reviews: cinemoodReviews } = useReviews(id);
 
-  // Merge reviews and filter out duplicates
+  // merge local and tmdb reviews, removing duplicates
   const displayReviews = [
     ...cinemoodReviews,
     ...tmdbReviews.filter(tmdb => !cinemoodReviews.find(c => c.movieId === tmdb.id?.toString()))
@@ -39,8 +40,7 @@ const MovieReviews = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative pb-20 px-4 md:px-0">
       
-      {/* Cinematic Header Background - Responsive Height */}
-      <div className="absolute -top-26 left-0 w-full h-[400px] md:h-[500px] pointer-events-none overflow-hidden">
+      <div className="absolute -top-26 left-1/2 -translate-x-1/2 w-screen h-[400px] md:h-[500px] pointer-events-none overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 blur-3xl scale-110"
           style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` }}
@@ -51,7 +51,6 @@ const MovieReviews = () => {
       <div className="relative z-10 max-w-6xl mx-auto">
         <GoBackBtn />
 
-        {/* Header Section - Stacked on mobile, side-by-side on md+ */}
         <header className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-end mt-8 mb-12 md:mb-20">
           <motion.img 
             initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
@@ -60,7 +59,7 @@ const MovieReviews = () => {
             alt={movie.title}
           />
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-3 leading-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl max-w-2xl font-black tracking-tight mb-3 leading-tight">
               {movie.title} <span className="text-neutral-600 italic font-light">Reviews</span>
             </h1>
             <div className="flex items-center justify-center md:justify-start gap-4 text-xs md:text-sm font-bold text-neutral-400 mb-8">
@@ -79,9 +78,9 @@ const MovieReviews = () => {
           </div>
         </header>
 
-        {/* Reviews Grid - 1 col on mobile, 2 on md+ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {displayReviews.map((r, index) => {
+            // handle mapping differences between tmdb and cinemood schemas
             const isCinemood = !!r.userName;
             const content = r.content || r.text;
             const author = r.userName || r.author;
@@ -101,19 +100,19 @@ const MovieReviews = () => {
                     : 'bg-white/[0.02] border-white/5 hover:border-white/20'
                 }`}
               >
-                <RiDoubleQuotesL className="absolute -top-2 -right-2 text-white/[0.03] size-24 pointer-events-none group-hover:scale-110 transition-transform" />
+                <RiDoubleQuotesL className="absolute -top-2 -right-2 text-white/[0.03] size-24 pointer-events-none" />
 
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-black font-black text-sm shadow-inner ${isCinemood ? 'bg-[#FFC509]' : 'bg-zinc-800 text-white'}`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-black font-black text-sm ${isCinemood ? 'bg-[#FFC509]' : 'bg-zinc-800 text-white'}`}>
                         {author[0]}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-sm font-bold truncate max-w-[140px] md:max-w-[180px]">{author}</h4>
+                        <h4 className="text-sm font-bold truncate max-w-[140px]">{author}</h4>
                         {isCinemood && (
                           <span className="text-[9px] text-[#FFC509] font-black uppercase tracking-widest flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-[#FFC509] animate-pulse" /> CineMood User
+                            <span className="w-1 h-1 rounded-full bg-[#FFC509] animate-pulse" /> cinemood user
                           </span>
                         )}
                       </div>
@@ -122,15 +121,14 @@ const MovieReviews = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-[#FFC509] font-black text-sm bg-black/40 px-2 py-1 rounded-lg border border-white/5">★ {rating}</span>
                       
-                      {/* REPORT BUTTON: Only for Cinemood reviews, stopPropagation prevents modal overlap */}
+                      {/* stop propagation to avoid opening review modal when clicking report */}
                       {isCinemood && (
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             setReportingReview(r);
                           }}
-                          className="md:opacity-0 group-hover:opacity-100 transition-opacity p-2 text-neutral-600 hover:text-red-500 bg-white/5 rounded-lg"
-                          title="Report Review"
+                          className="md:opacity-0 group-hover:opacity-100 p-2 text-neutral-600 hover:text-red-500 bg-white/5 rounded-lg transition-all"
                         >
                           <Flag size={14} />
                         </button>
@@ -138,16 +136,16 @@ const MovieReviews = () => {
                     </div>
                   </div>
 
-                  <p className="text-sm text-neutral-400 leading-relaxed line-clamp-4 group-hover:text-neutral-200 transition-colors italic">
+                  <p className="text-sm text-neutral-400 leading-relaxed line-clamp-4 italic">
                     "{content}"
                   </p>
 
                   <div className="mt-6 flex justify-between items-center">
-                    <button className="text-[10px] font-black text-[#FFC509] uppercase tracking-[0.2em] flex items-center gap-2 group-hover:translate-x-1 transition-transform">
-                      View Full Review <span>→</span>
+                    <button className="text-[10px] font-black text-[#FFC509] uppercase tracking-[0.2em]">
+                      view full review <span>→</span>
                     </button>
                     {r.createdAt && (
-                       <span className="text-[9px] font-bold text-neutral-600 uppercase tracking-tighter">
+                       <span className="text-[9px] font-bold text-neutral-600 uppercase">
                          {new Date(r.createdAt).toLocaleDateString()}
                        </span>
                     )}
@@ -159,7 +157,6 @@ const MovieReviews = () => {
         </div>
       </div>
 
-      {/* Modals Container */}
       <AnimatePresence>
         {openPostModal && (
           <ReviewModal movie={movie} onClose={() => setOpenPostModal(false)} />

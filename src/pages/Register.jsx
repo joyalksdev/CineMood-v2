@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import LoginNavbar from "../components/layout/LoginNavbar";
-import Footer from "../components/layout/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,7 +6,7 @@ import { registerSchema } from "../validations/authSchema";
 import { registerUser } from "../services/authService";
 import { useUser } from "../context/UserContext";
 import { FadeLoader } from "react-spinners";
-import { Mail, Lock, UserPlus } from "lucide-react"; // Matching your modern icon style
+import { Mail, Lock, UserPlus } from "lucide-react"; 
 import toast from "react-hot-toast";
 import Meta from "../components/ui/Meta";
 
@@ -23,6 +21,7 @@ const Register = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(registerSchema),
+    mode: "onBlur", // Validates when user leaves the field
   });
 
   const onSubmit = async (data) => {
@@ -50,12 +49,12 @@ const Register = () => {
 
   return (
     <>
-    <Meta title="Join" />
-      <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10">
+      <Meta title="Join CineMood" />
+      <main className="min-h-screen flex justify-center items-center px-4 sm:px-6 my-10 bg-transparent">
         {loading ? (
           <div className="flex flex-col items-center justify-center p-10">
             <FadeLoader color="#FFC509" />
-            <p className="text-neutral-400 text-sm mt-5 tracking-widest uppercase font-bold">
+            <p className="text-neutral-400 text-sm mt-5 tracking-widest uppercase font-black animate-pulse">
               Creating your account...
             </p>
           </div>
@@ -83,12 +82,15 @@ const Register = () => {
                   <Mail size={18} className="absolute left-4 top-4 text-neutral-600 group-focus-within:text-[#FFC509] transition-colors" />
                   <input
                     {...register("email")}
-                    className="w-full px-12 border border-neutral-800 bg-neutral-900/50 py-3.5 rounded-2xl outline-none focus:border-[#FFC509]/40 text-white transition-all placeholder:text-neutral-700"
+                    autoComplete="email"
+                    className={`w-full px-12 border bg-neutral-900/50 py-3.5 rounded-2xl outline-none transition-all placeholder:text-neutral-700 text-white ${
+                      errors.email ? "border-red-500/50" : "border-neutral-800 focus:border-[#FFC509]/40"
+                    }`}
                     placeholder="Email Address"
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider">
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider animate-in slide-in-from-left-1">
                     {errors.email.message}
                   </p>
                 )}
@@ -101,12 +103,15 @@ const Register = () => {
                   <input
                     type="password"
                     {...register("password")}
-                    className="w-full px-12 border border-neutral-800 bg-neutral-900/50 py-3.5 rounded-2xl outline-none focus:border-[#FFC509]/40 text-white transition-all placeholder:text-neutral-700"
+                    autoComplete="new-password"
+                    className={`w-full px-12 border bg-neutral-900/50 py-3.5 rounded-2xl outline-none transition-all placeholder:text-neutral-700 text-white ${
+                      errors.password ? "border-red-500/50" : "border-neutral-800 focus:border-[#FFC509]/40"
+                    }`}
                     placeholder="Create Password"
                   />
                 </div>
                 {errors.password && (
-                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider">
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider animate-in slide-in-from-left-1">
                     {errors.password.message}
                   </p>
                 )}
@@ -119,18 +124,22 @@ const Register = () => {
                   <input
                     type="password"
                     {...register("confirmPassword")}
-                    className="w-full px-12 border border-neutral-800 bg-neutral-900/50 py-3.5 rounded-2xl outline-none focus:border-[#FFC509]/40 text-white transition-all placeholder:text-neutral-700"
+                    autoComplete="new-password"
+                    className={`w-full px-12 border bg-neutral-900/50 py-3.5 rounded-2xl outline-none transition-all placeholder:text-neutral-700 text-white ${
+                      errors.confirmPassword ? "border-red-500/50" : "border-neutral-800 focus:border-[#FFC509]/40"
+                    }`}
                     placeholder="Confirm Password"
                   />
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider">
+                  <p className="text-red-400 text-[10px] uppercase font-bold ml-2 tracking-wider animate-in slide-in-from-left-1">
                     {errors.confirmPassword.message}
                   </p>
                 )}
               </div>
 
               <button
+                type="submit"
                 disabled={loading}
                 className="bg-[#FFC509] mt-2 py-4 text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:scale-[1.02] transition active:scale-95 disabled:opacity-50"
               >

@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // fixed: needed this for the hash logic
 import {
   Shield,
   FileText,
   Cookie,
   ChevronRight,
   Lock,
-  Eye,
-  Database,
   Terminal,
 } from "lucide-react";
 
 const LegalDocs = () => {
+  const location = useLocation(); // get current location
   const [activeTab, setActiveTab] = useState("privacy");
 
+  // sidebar menu items
   const menuItems = [
     { id: "privacy", label: "Privacy Policy", icon: <Shield size={18} /> },
     { id: "terms", label: "Terms & Conditions", icon: <FileText size={18} /> },
     { id: "cookies", label: "Cookie Policy", icon: <Cookie size={18} /> },
   ];
 
+  // all policy text stored here
   const content = {
     privacy: {
       title: "Privacy Policy",
@@ -72,6 +74,7 @@ const LegalDocs = () => {
     },
   };
 
+  // sync tab with url hash if user navigates here directly
   useEffect(() => {
     const hash = location.hash.replace("#", "");
     if (["privacy", "terms", "cookies"].includes(hash)) {
@@ -82,13 +85,14 @@ const LegalDocs = () => {
   return (
     <div className="min-h-screen bg-black text-white pt-28 pb-20 px-4 md:px-10">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12">
-        {/* Sidebar Navigation */}
+        
+        {/* sidebar nav */}
         <aside className="w-full lg:w-64 shrink-0 space-y-2">
           <div className="px-4 mb-6">
             <div className="flex items-center gap-2 text-[#FFC509] mb-1">
               <Terminal size={14} />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-                Documentation
+                documentation
               </span>
             </div>
             <h2 className="text-xl font-black tracking-tight">Legal Center</h2>
@@ -115,14 +119,14 @@ const LegalDocs = () => {
           </nav>
         </aside>
 
-        {/* Content Area */}
+        {/* main content card */}
         <main className="flex-1 bg-neutral-900/30 border border-white/5 rounded-[2.5rem] p-8 md:p-12 animate-in fade-in slide-in-from-right-4 duration-500">
           <header className="mb-12 border-b border-white/5 pb-8">
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">
               {content[activeTab].title}
             </h1>
             <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.2em]">
-              Last Version: {content[activeTab].lastUpdated}
+              last version: {content[activeTab].lastUpdated}
             </p>
           </header>
 
@@ -140,7 +144,7 @@ const LegalDocs = () => {
             ))}
           </div>
 
-          {/* Bottom Callout */}
+          {/* footer callout */}
           <footer className="mt-16 p-6 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4">
             <div className="p-3 bg-[#FFC509]/10 rounded-xl text-[#FFC509]">
               <Lock size={20} />

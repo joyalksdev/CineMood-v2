@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../services/axios";
 import { Users, Activity, ShieldAlert, Zap, TrendingUp } from "lucide-react";
-
-// ADD THESE LINE FOR THE GRAPHS:
 import { 
   AreaChart, 
   Area, 
@@ -12,6 +10,7 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
+
 import InfoTooltip from "../../components/ui/InfoTooltip";
 
 const AdminDashboard = () => {
@@ -24,43 +23,51 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState([]);
 
-  const processChartData = (rawLogs) => {
-  const last7Days = [...Array(7)].map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    return { 
-      date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      fullDate: d.toISOString().split('T')[0],
-      requests: 0 
-    };
-  }).reverse();
+  /**
+   * processChartData
+   * Generates a continuous 7-day array and populates it with 
+   * request counts from the raw log data provided by the backend.
+   */
+  const processChartData = (rawLogs = []) => {
+    // 1. Generate the last 7 days (including today)
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      return { 
+        date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        fullDate: d.toISOString().split('T')[0],
+        requests: 0 
+      };
+    }).reverse();
 
-  rawLogs.forEach(log => {
-    const logDate = new Date(log.timestamp).toISOString().split('T')[0];
-    const dayEntry = last7Days.find(d => d.fullDate === logDate);
-    if (dayEntry) dayEntry.requests++;
-  });
+    // 2. Map logs to their respective days
+    rawLogs.forEach(log => {
+      if (!log.timestamp) return; 
+      
+      const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+      const dayEntry = last7Days.find(d => d.fullDate === logDate);
+      
+      if (dayEntry) {
+        dayEntry.requests++;
+      }
+    });
 
-  return last7Days;
-};
+    return last7Days;
+  };
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         const { data } = await api.get("/admin/dashboard-data");
-        
-        // 1. Set the 4 cards
-        setStats(data.stats);
-        
-        // 2. Process the raw logs into graph points
-        if (data.chartDataRaw) {
-          const formattedData = processChartData(data.chartDataRaw);
-          setChartData(formattedData);
-        }
+        setStats(data.stats || stats);
 
-        setLoading(false);
+        if (data.chartDataRaw) {
+          const combinedChart = processChartData(data.chartDataRaw);
+          setChartData(combinedChart);
+        }
       } catch (err) {
         console.error("Dashboard sync failed", err);
+      } finally {
         setLoading(false);
       }
     };
@@ -104,25 +111,23 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 md:p-10 bg-[#050505] min-h-screen text-white">
-      {/* Header */}
+      {/* Header Section */}
       <div className="mb-10">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              System <span className="text-[#FFC509]">Dashboard</span>
-            </h1>
-            <InfoTooltip 
-              title="Live Metrics"
-              content="See a quick summary of app's growth. Track total users, recent reviews, and movie database stats to see how the platform is performing today." 
-            />
-          </div>
-          <p className="text-xs text-neutral-500 mt-1 font-semibold uppercase tracking-widest">
-            Real-time platform overview
-          </p>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight text-white">
+            System <span className="text-[#FFC509]">Dashboard</span>
+          </h1>
+          <InfoTooltip 
+            title="Live Metrics"
+            content="Real-time analytics covering user growth, AI utilization, and system security status." 
+          />
         </div>
+        <p className="text-xs text-neutral-500 mt-1 font-semibold uppercase tracking-widest">
+          Real-time platform overview
+        </p>
       </div>
 
-      {/* The 4 Cards Grid */}
+      {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {cardData.map((card, index) => (
           <div 
@@ -148,13 +153,12 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Place for a small "Recent Activity" snippet or Chart below */}
-      {/* Dashboard Bottom Section */}
+      {/* Main Content: Chart & Health */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Chart Section (Takes up 2 columns) */}
-          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/5 rounded-3xl p-8">
-            <h2 className="text-sm font-bold mb-6 opacity-50 uppercase tracking-widest">Traffic Flow</h2>
+          {/* Traffic Flow Chart */}
+          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/5 rounded-3xl p-8 shadow-sm">
+            <h2 className="text-sm font-bold mb-6 opacity-50 uppercase tracking-widest">Traffic Flow (7D)</h2>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
@@ -192,7 +196,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Health Section (Takes up 1 column) */}
+          {/* System Health Section */}
           <div className="bg-[#0A0A0A] border border-white/5 rounded-3xl p-8 flex flex-col justify-between">
              <div>
                 <h2 className="text-sm font-bold mb-6 opacity-50 uppercase tracking-widest">System Health</h2>
@@ -220,7 +224,7 @@ const AdminDashboard = () => {
              
              <div className="mt-8 pt-6 border-t border-white/5">
                 <p className="text-[10px] text-neutral-600 italic">
-                  * All systems operational. No packet loss detected in the current sector.
+                  * All systems operational. Monitoring incoming AI nodes.
                 </p>
              </div>
           </div>

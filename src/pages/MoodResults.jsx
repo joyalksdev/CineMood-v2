@@ -5,6 +5,8 @@ import { FadeLoader } from 'react-spinners'
 import QuickViewModal from '../components/modals/QuickViewModal'
 import moviePlaceholder from "../assets/m-placeholder.png"
 import ScrollToTopButton from '../components/ui/ScrollToTopButton'
+import GoBackBtn from '../components/ui/GoBackBtn'
+import Meta from '../components/ui/Meta'
 
 const MoodResults = () => {
   const { state } = useLocation()
@@ -14,14 +16,16 @@ const MoodResults = () => {
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
 
-  // RESET state when mood/genres change
+  const moodTitle = state?.mood || 'Custom Selection'
+
+  // reset state when navigation state changes
   useEffect(() => {
     setMovies([])
     setPage(1)
     setHasMore(true)
   }, [state])
 
-  // FETCH logic with duplicate prevention
+  // fetch data based on mood keyword or genres
   useEffect(() => {
     if (!state) return
     setLoading(true)
@@ -32,6 +36,7 @@ const MoodResults = () => {
         return
       }
       setMovies((prev) => {
+        // use set to block duplicate movie ids from multiple pages
         const existingIds = new Set(prev.map(m => m.id))
         const uniqueNewMovies = data.filter(m => !existingIds.has(m.id))
         return [...prev, ...uniqueNewMovies]
@@ -49,12 +54,12 @@ const MoodResults = () => {
     }
   }, [state, page])
 
-  // INFINITE SCROLL listener
+  // infinite scroll logic
   useEffect(() => {
     const onScroll = () => {
       if (
         window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 300 &&
+        document.body.offsetHeight - 500 && // 500px threshold for smoother loading
         !loading && hasMore
       ) {
         setPage(p => p + 1)
@@ -65,7 +70,10 @@ const MoodResults = () => {
   }, [loading, hasMore])
 
   return (
-    <div className="px-6 text-white min-h-screen">
+    <div className="relative px-6 text-white min-h-screen pb-20">
+      <Meta title={`Vibe: ${moodTitle}`} />
+      
+
       {selectedMovie && (
         <QuickViewModal
           movie={selectedMovie}
@@ -74,75 +82,75 @@ const MoodResults = () => {
       )}
 
       <div className="max-w-7xl mx-auto">
-        <header className="mb-10">
-          <h1 className="text-4xl font-extrabold tracking-tight">
-            Results for: <span className="text-yellow-400 capitalize">{state?.mood || 'Custom Selection'}</span>
-          </h1>
-          <p className="text-gray-400 mt-2">Discovering movies that match your current vibe.</p>
+        <header className="mb-16 space-y-4">
+          <GoBackBtn />
+          <div>
+            <h1 className="text-4xl md:text-6xl font-black tracking-wide italic">
+              Vibe: <span className="text-[#FFC509]">{moodTitle}</span>
+            </h1>
+            <p className="text-neutral-500 font-bold text-xs uppercase tracking-[0.3em] mt-2">
+              Neural matches found for your current state
+            </p>
+          </div>
         </header>
 
-        {/*  RESULTS GRID */}
         {movies.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-5 gap-y-10 animate-in fade-in duration-700">
             {movies.map(movie => (
               <div 
                 key={movie.id} 
-                className="group relative bg-[#1a1a1a] rounded-2xl overflow-hidden border border-white/5 hover:border-yellow-400/50 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-yellow-400/10"
+                className="group relative cursor-pointer"
                 onClick={() => setSelectedMovie(movie)}
               >
-                {/* Image Container */}
-                <div className="relative aspect-[2/3] overflow-hidden">
+                <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/5 group-hover:border-[#FFC509]/30 transition-all duration-500 shadow-2xl bg-neutral-900">
                   <img
                     src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     alt={movie.title}
+                    loading="lazy"
                   />
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                   
-                  {/* Rating Badge */}
                   {movie.vote_average > 0 && (
-                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-yellow-400 text-xs font-bold border border-white/10">
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[#FFC509] text-[10px] font-black border border-white/10">
                       ★ {movie.vote_average.toFixed(1)}
                     </div>
                   )}
                 </div>
 
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-yellow-400 transition-colors">
+                <div className="mt-4 space-y-1 px-1">
+                  <h3 className="font-bold text-sm truncate group-hover:text-[#FFC509] transition-colors">
                     {movie.title}
                   </h3>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-500">
-                      {movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}
-                    </span>
-                  </div>
+                  <p className="text-[10px] text-neutral-600 font-black uppercase tracking-widest">
+                    {movie.release_date ? movie.release_date.split('-')[0] : 'n/a'}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         ) : !loading && (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-semibold text-gray-500">No movies found for this mood.</h2>
-            <p className="text-gray-600 mt-2">Try adjusting your filters or searching for something else!</p>
+          <div className="text-center py-40 border border-dashed border-white/5 rounded-[3rem] bg-white/[0.01]">
+            <h2 className="text-neutral-500 font-black uppercase tracking-widest text-xs">Signal Lost: No movies match this vibe.</h2>
           </div>
         )}
 
-        {/* 5. LOADING / FOOTER */}
-        <div className="flex flex-col items-center justify-center mt-16 pb-20">
+        <div className="flex flex-col items-center justify-center mt-24">
           {loading ? (
-            <FadeLoader color="#FFC509" radius={-5} width={4} />
+            <div className="flex flex-col items-center gap-4">
+              <FadeLoader color="#FFC509" />
+              <span className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.4em] animate-pulse">Syncing Database</span>
+            </div>
           ) : hasMore && movies.length > 0 && (
             <button
               onClick={() => setPage(p => p + 1)}
-              className="group flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-yellow-400 hover:text-black border border-white/10 hover:border-yellow-400 transition-all duration-300 rounded-full font-bold"
+              className="px-10 py-4 bg-white/5 hover:bg-[#FFC509] hover:text-black border border-white/10 hover:border-[#FFC509] transition-all duration-300 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 shadow-2xl"
             >
-              Show More 🎬
+              Expand Sector 🎬
             </button>
           )}
           {!hasMore && movies.length > 0 && (
-            <p className="text-gray-500 italic">You've reached the end of the mood board.</p>
+            <p className="text-neutral-700 font-black uppercase text-[10px] tracking-[0.2em] italic">Sector Fully Indexed</p>
           )}
         </div>
       </div>

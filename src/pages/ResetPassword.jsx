@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Lock, Eye, EyeOff, ShieldCheck, Loader2 } from 'lucide-react';
+import { Lock, Eye, EyeOff, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 import Meta from '../components/ui/Meta';
 
 const ResetPassword = () => {
@@ -10,15 +10,21 @@ const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [status, setStatus] = useState("idle"); // idle, loading, success, error
+  const [status, setStatus] = useState("idle"); // idle, loading, success, error, mismatch
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleReset = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) return alert("Passwords do not match");
+    
+    if (password !== confirmPassword) {
+      setStatus("mismatch");
+      setErrorMessage("Passwords do not match");
+      setTimeout(() => setStatus("idle"), 3000);
+      return;
+    }
 
     setStatus("loading");
     try {
-      // Note: Backend uses .put('/resetpassword/:resettoken')
       const { data } = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/auth/resetpassword/${token}`, 
         { password },
@@ -27,11 +33,13 @@ const ResetPassword = () => {
 
       if (data.success) {
         setStatus("success");
+        // Redirecting to home as per your original logic
         setTimeout(() => navigate('/home'), 2000);
       }
     } catch (err) {
       setStatus("error");
-      setTimeout(() => setStatus("idle"), 3000);
+      setErrorMessage(err.response?.data?.error || "Link expired or invalid");
+      setTimeout(() => setStatus("idle"), 4000);
     }
   };
 
@@ -45,12 +53,14 @@ const ResetPassword = () => {
           <div className="inline-flex p-4 rounded-full bg-[#FFC509]/10 text-[#FFC509] mb-6">
             <ShieldCheck size={32} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tighter text-white">Secure your <span className="text-[#FFC509]">Account</span></h2>
+          <h2 className="text-3xl font-bold tracking-tighter text-white">
+            Secure your <span className="text-[#FFC509]">Account</span>
+          </h2>
           <p className="text-white/40 text-sm mt-2 font-medium">Create a strong new password below.</p>
         </div>
 
         {status === "success" ? (
-          <div className="text-center py-10 animate-in fade-in zoom-in">
+          <div className="text-center py-10 animate-in fade-in zoom-in duration-500">
              <div className="text-[#FFC509] font-black uppercase tracking-widest text-xs">Password Updated</div>
              <p className="text-white/20 text-[10px] mt-2 italic">Redirecting you to the experience...</p>
           </div>
@@ -97,8 +107,11 @@ const ResetPassword = () => {
               {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : "Update Password"}
             </button>
             
-            {status === "error" && (
-              <p className="text-red-500/80 text-[10px] text-center font-bold tracking-widest uppercase">Link expired or invalid</p>
+            {(status === "error" || status === "mismatch") && (
+              <div className="flex items-center justify-center gap-2 text-red-500/80 animate-in fade-in slide-in-from-bottom-2">
+                <AlertCircle size={12} />
+                <p className="text-[10px] font-bold tracking-widest uppercase">{errorMessage}</p>
+              </div>
             )}
           </form>
         )}

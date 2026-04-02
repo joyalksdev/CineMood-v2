@@ -6,22 +6,27 @@ import { ImFire } from "react-icons/im";
 import { PiFilmSlateFill } from "react-icons/pi";
 import { useUser } from '../context/UserContext'
 import AboutSection from '../components/sections/AboutSection'
-import DeveloperSpotlight from '../components/sections/DeveloperSpotlight' // Import the new section
+import DeveloperSpotlight from '../components/sections/DeveloperSpotlight' 
 
 const Landing = () => {
+  // ref for the smooth scroll feature
   const aboutRef = useRef(null);
 
+  // function to handle the scroll click from hero
   const scrollToAbout = () => {
     aboutRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <main className='min-h-screen px-4 md:px-10 pt-22 bg-black'>
-      {/* Hero Section */}
-      <Hero  onAboutClick={scrollToAbout}/>
+      
+      {/* main hero with scroll trigger */}
+      <Hero onAboutClick={scrollToAbout}/>
 
-      {/* Feature Cards Grid */}
+      {/* grid for the 3 main feature cards */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16'>
+        
+        {/* card 1: smart matching */}
         <SpotlightCard spotlightColor="#ceb04f">
           <div className='p-6'>
             <RiShiningFill className='size-10 text-[#FFC509]'/>
@@ -35,6 +40,7 @@ const Landing = () => {
           </div>
         </SpotlightCard>
 
+        {/* card 2: tmdb data */}
         <SpotlightCard spotlightColor="#ceb04f">
           <div className='p-6'>
             <PiFilmSlateFill className='size-10 text-[#FFC509]'/>
@@ -48,6 +54,7 @@ const Landing = () => {
           </div>
         </SpotlightCard>
 
+        {/* card 3: trending movies */}
         <SpotlightCard spotlightColor="#ceb04f">
           <div className='p-6'>
             <ImFire className='size-10 text-[#FFC509]'/>
@@ -62,13 +69,14 @@ const Landing = () => {
         </SpotlightCard>
       </div>
 
-      {/* About Section - Explains the MERN + AI magic */}
+      {/* ref here to target the scroll */}
       <div ref={aboutRef}>
-        <AboutSection  />
+        <AboutSection />
       </div>
 
-      {/* Developer Spotlight - Redirects to your contact/socials */}
+      {/* dev info section */}
       <DeveloperSpotlight />
+      
     </main>
   )
 }

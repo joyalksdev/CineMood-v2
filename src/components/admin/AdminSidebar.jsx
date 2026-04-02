@@ -71,7 +71,7 @@ const AdminSidebar = () => {
       )}
 
       {/* --- FIXED SIDEBAR --- */}
-      <aside className={`
+      <aside data-lenis-prevent className={`
         fixed top-0 left-0 z-[65]
         w-72 h-screen bg-[#050505] border-r border-white/5 
         flex flex-col p-6 transition-all duration-500 ease-in-out

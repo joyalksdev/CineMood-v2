@@ -14,63 +14,56 @@ import DeleteModal from "../components/modals/DeleteModal";
 const Watchlist = () => {
   const { watchlist, removeFromWatchlist, loading } = useWatchlist();
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [openDeleteModal, setOpenDeleteModal ] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [movieToDelete, setMovieToDelete] = useState(null);
-  const [hoveredId, setHoveredId] = useState(null); 
-  const hasNotified = useRef(false); // Ref prevents double-triggering in StrictMode
   const navigate = useNavigate();
 
   const progress = Math.min((watchlist.length / 5) * 100, 100);
   const isUnlocked = watchlist.length >= 5;
 
-  // Neural Engine One-Time Notification Logic
-  // Neural Engine One-Time Notification Logic
-useEffect(() => {
-  // Check local storage to see if we already notified for this "session" of being at 5+ movies
-  const alreadyNotified = localStorage.getItem("neural_engine_notified") === "true";
+  // Neural Engine Notification Logic
+  useEffect(() => {
+    const alreadyNotified = localStorage.getItem("neural_engine_notified") === "true";
 
-  if (watchlist.length >= 5 && !alreadyNotified) {
-    // Mark as notified in Local Storage immediately
-    localStorage.setItem("neural_engine_notified", "true");
-    
-    toast.custom((t) => (
-      <div className={`${t.visible ? 'animate-in fade-in zoom-in-95' : 'animate-out fade-out zoom-out-95'} 
-        max-w-md w-full bg-[#121212] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl pointer-events-auto 
-        flex border border-[#FFC509]/30 backdrop-blur-xl transition-all duration-300`}>
-        <div className="flex-1 w-0 p-4">
-          <div className="flex items-start">
-            <div className="flex-shrink-0 pt-0.5">
-              <BrainCircuit className="h-10 w-10 text-[#FFC509] animate-pulse" />
-            </div>
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-black text-white uppercase tracking-widest italic">Neural Engine Online</p>
-              <p className="mt-1 text-[11px] text-white/60 leading-relaxed font-medium">
-                Threshold reached. Your unique <span className="text-[#FFC509]">Weekly Spotlight</span> has been synthesized based on your taste.
-              </p>
+    if (watchlist.length >= 5 && !alreadyNotified) {
+      localStorage.setItem("neural_engine_notified", "true");
+      
+      toast.custom((t) => (
+        <div className={`${t.visible ? 'animate-in fade-in zoom-in-95' : 'animate-out fade-out zoom-out-95'} 
+          max-w-md w-full bg-[#121212] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl pointer-events-auto 
+          flex border border-[#FFC509]/30 backdrop-blur-xl transition-all duration-300`}>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 pt-0.5">
+                <BrainCircuit className="h-10 w-10 text-[#FFC509] animate-pulse" />
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-black text-white uppercase tracking-widest italic">Neural Engine Online</p>
+                <p className="mt-1 text-[11px] text-white/60 leading-relaxed font-medium">
+                  Threshold reached. Your unique <span className="text-[#FFC509]">Weekly Spotlight</span> has been synthesized based on your taste.
+                </p>
+              </div>
             </div>
           </div>
+          <div className="flex border-l border-white/10">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                navigate('/home', { state: { scrollToSpotlight: true } });
+              }}
+              className="w-full px-6 flex items-center justify-center text-[10px] font-black tracking-tighter text-[#FFC509] hover:bg-[#FFC509]/5 transition-colors uppercase italic"
+            >
+              View
+            </button>
+          </div>
         </div>
-        <div className="flex border-l border-white/10">
-          <button
-            onClick={() => {
-              toast.dismiss(t.id);
-              navigate('/home', { state: { scrollToSpotlight: true } });
-            }}
-            className="w-full px-6 flex items-center justify-center text-[10px] font-black tracking-tighter text-[#FFC509] hover:bg-[#FFC509]/5 transition-colors uppercase italic"
-          >
-            View
-          </button>
-        </div>
-      </div>
-    ), { id: 'neural-engine-trigger', duration: 6000 });
-  } 
-  
-  // If they drop below 5, reset the flag so they get the "hype" again when they hit 5 next time
-  if (watchlist.length < 5 && alreadyNotified) {
-    localStorage.setItem("neural_engine_notified", "false");
-  }
-}, [watchlist.length, navigate]);
-
+      ), { id: 'neural-engine-trigger', duration: 6000 });
+    } 
+    
+    if (watchlist.length < 5 && alreadyNotified) {
+      localStorage.setItem("neural_engine_notified", "false");
+    }
+  }, [watchlist.length, navigate]);
 
   if (loading) {
     return (
@@ -121,10 +114,11 @@ useEffect(() => {
 
             {isUnlocked && (
               <button onClick={()=> navigate('/home', { state: { scrollToSpotlight: true } })}
-            className="text-[10px] font-bold text-green-400 hover:text-[#FFC509] uppercase duration-300 cursor-pointer"
-            > View Spotlight</button>
+                className="mt-2 text-[10px] font-bold text-green-400 hover:text-[#FFC509] uppercase duration-300 cursor-pointer"
+              > 
+                View Spotlight
+              </button>
             )}
-            
           </div>
         </header>
 
@@ -142,6 +136,8 @@ useEffect(() => {
                 <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} key={movie.id} className="group relative">
                   <div className="relative overflow-hidden rounded-2xl aspect-[2/3] bg-white/5 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-[#FFC509]/50 cursor-pointer" onClick={() => setSelectedMovie(movie)}>
                     <img src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={movie.title} />
+                    
+                    {/* Mobile Remove Button */}
                     <button
                         onClick={(e) => { 
                             e.stopPropagation(); 
@@ -150,7 +146,9 @@ useEffect(() => {
                         }}
                         className="absolute bottom-4 left-1/2 -translate-x-1/2 md:hidden flex items-center gap-2 bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-white font-bold text-xs">
                         <LucideTrash size={14} /> REMOVE
-                      </button>
+                    </button>
+
+                    {/* Desktop Hover Overlay */}
                     <div className="absolute hidden md:block inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <button
                         onClick={(e) => { 
@@ -175,22 +173,26 @@ useEffect(() => {
           {selectedMovie && <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />}
         </AnimatePresence>
       </div>
+      
       <ScrollToTopButton />
+      
       <DeleteModal
         isOpen={openDeleteModal}
         onCancel={() => {
           setOpenDeleteModal(false);
-          setMovieToDelete(null); // Clear selection on cancel
+          setMovieToDelete(null);
         }}
         onConfirm={() => {
-          removeFromWatchlist(movieToDelete.id); // Use the ID from state
+          if (movieToDelete) {
+            removeFromWatchlist(movieToDelete.id);
+            toast.success("Removed from watchlist");
+          }
           setOpenDeleteModal(false);
           setMovieToDelete(null);
-          toast.success("Removed from watchlist");
         }}
         title="Remove Movie?"
-        message={`Are you sure you want to remove "${movieToDelete?.title}" from your Watchlist?`}
-        confirmText="Delete Movie"
+        message={`Are you sure you want to remove "${movieToDelete?.title || 'this movie'}" from your Watchlist?`}
+        confirmText="Remove"
       />
     </motion.div>
   );

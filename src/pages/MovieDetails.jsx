@@ -28,7 +28,6 @@ const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  // States
   const [movie, setMovie] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
@@ -36,15 +35,16 @@ const MovieDetails = () => {
   const [openReview, setOpenReview] = useState(false);
   const [reportingReview, setReportingReview] = useState(null);
 
-  // DB Reviews Hook
+  // fetch local reviews from custom hook
   const { reviews } = useReviews(id);
 
-  // LOGIC: Combine reviews and ensure we only take what we need
+  // prioritize local reviews for the preview section
   const displayReviews = reviews.length > 0 ? reviews.slice(0, 4) : tmdbReviews.slice(0, 4);
 
   useEffect(() => {
     const load = async () => {
       try {
+        // parallel fetch for movie data and external reviews
         const [movieData, tmdb] = await Promise.all([
           fetchMovieDetails(id),
           fetchMovieReviews(id, 1)
@@ -52,7 +52,7 @@ const MovieDetails = () => {
         setMovie(movieData);
         setTmdbReviews(tmdb.results || []);
       } catch (err) {
-        console.error("Failed to load movie:", err);
+        console.error("failed to load movie:", err);
       }
     };
     load();
@@ -65,7 +65,7 @@ const MovieDetails = () => {
     </div>
   );
 
-  // Crew filtering logic
+  // extract specific crew roles
   const director = movie.credits?.crew?.find(person => person.job === "Director");
   const writers = movie.credits?.crew
     ?.filter(person => ["Writer", "Screenplay", "Author"].includes(person.job))
@@ -90,8 +90,7 @@ const MovieDetails = () => {
     >
       <Meta title={movie.title} />
 
-      {/* 1. Cinematic Backdrop */}
-      <div className="absolute -top-26 left-0 lg:-left-10 w-[100vw] h-[650px] pointer-events-none overflow-hidden">
+      <div className="absolute -top-26 left-1/2 -translate-x-1/2 w-screen h-[650px] pointer-events-none overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 blur-3xl scale-110"
           style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` }}
@@ -99,11 +98,10 @@ const MovieDetails = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/90 to-[#0a0a0a]" />
       </div>
 
-      <div className="relative z-10 px-6 lg:px-0">
+      <div className="relative z-10 px-6 lg:px-0 max-w-7xl mx-auto">
         <GoBackBtn />
 
         <div className="flex flex-col lg:flex-row gap-12 mt-10">
-          {/* Poster */}
           <motion.div 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -116,7 +114,6 @@ const MovieDetails = () => {
             />
           </motion.div>
 
-          {/* Info Section */}
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -133,11 +130,10 @@ const MovieDetails = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-neutral-800" />
               <span>{movie.runtime}m</span>
               <span className="text-[10px] text-green-400 font-black uppercase tracking-widest border border-green-400/20 px-2.5 py-1 rounded">
-                MOVIE
+                movie
               </span>
             </div>
 
-            {/* Actions */}
             <div className="flex flex-wrap gap-3 mb-8">
               {trailer && (
                 <button 
@@ -160,11 +156,10 @@ const MovieDetails = () => {
               {movie.overview}
             </p>
 
-            {/* Crew */}
             <div className="flex flex-wrap gap-8 mb-8 pb-8 border-b border-white/5">
               {director && (
                 <div className="space-y-1">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Director</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">director</h3>
                   <p className="text-sm font-bold text-white hover:text-[#FFC509] cursor-pointer transition-colors" 
                     onClick={() => navigate(`/person/${director.id}`)}>
                     {director.name}
@@ -173,10 +168,10 @@ const MovieDetails = () => {
               )}
               {writers?.length > 0 && (
                 <div className="space-y-1">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Writers</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">writers</h3>
                   <p className="text-sm font-bold text-white">
                     {writers.map((w, i) => (
-                      <span key={`writer-${w.id}-${i}`} // Composite key to prevent duplicates
+                      <span key={`writer-${w.id}-${i}`}
                             className="hover:text-[#FFC509] cursor-pointer transition-colors"
                             onClick={() => navigate(`/person/${w.id}`)}>
                         {w.name}{i < writers.length - 1 ? ", " : ""}
@@ -187,16 +182,15 @@ const MovieDetails = () => {
               )}
             </div>
 
-            {/* Cast Scroller */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Cast</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">cast</h3>
                 <motion.button 
                   whileHover="hover" initial="initial"
                   onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
                   className="text-[10px] font-bold text-[#FFC509] flex items-center gap-2 uppercase tracking-widest"
                 >
-                  Full Cast <motion.span variants={arrowVariant}><HiOutlineArrowLongRight size={18} /></motion.span>
+                  full cast <motion.span variants={arrowVariant}><HiOutlineArrowLongRight size={18} /></motion.span>
                 </motion.button>
               </div>
               <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-2">
@@ -207,7 +201,7 @@ const MovieDetails = () => {
                       className="w-14 h-14 rounded-full object-cover border border-white/5 group-hover:border-green-400/50 transition-all duration-300"
                       alt={actor.name}
                     />
-                    <p className="text-[10px] mt-2 font-medium text-neutral-500 group-hover:text-white truncate transition-colors">
+                    <p className="text-[10px] mt-2 font-medium text-neutral-500 group-hover:text-white truncate">
                         {actor.name.split(' ')[0]}
                     </p>
                   </div>
@@ -217,7 +211,6 @@ const MovieDetails = () => {
           </motion.div>
         </div>
 
-        {/* 2. Reviews Section */}
         <section className="mt-24">
           <div className="flex justify-between items-end mb-8">
             <div className="space-y-1">
@@ -229,13 +222,12 @@ const MovieDetails = () => {
               onClick={() => navigate(`/movie/${id}/reviews`)}
               className="text-[10px] font-bold text-[#FFC509] flex items-center gap-2 uppercase tracking-widest"
             >
-              All Reviews <motion.span variants={arrowVariant}><HiOutlineArrowLongRight size={18} /></motion.span>
+              all reviews <motion.span variants={arrowVariant}><HiOutlineArrowLongRight size={18} /></motion.span>
             </motion.button>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {displayReviews.length > 0 ? displayReviews.map((r, index) => {
-              // FIX: Ensure we have a unique key even if API IDs clash
               const reviewKey = r._id || r.id || `review-${index}`;
               
               return (
@@ -255,11 +247,11 @@ const MovieDetails = () => {
                         {(r.userName || r.username || r.author || "?")[0]}
                         </div>
                         <span className="text-sm font-bold tracking-tight">{r.userName || r.username || r.author}</span>
-                        {(r.userName || r.username) && <span className="text-[8px] px-2 py-0.5 bg-green-400/20 text-green-400 rounded-full font-black uppercase">CineMood</span>}
+                        {(r.userName || r.username) && <span className="text-[8px] px-2 py-0.5 bg-green-400/20 text-green-400 rounded-full font-black uppercase">cinemood</span>}
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-[#FFC509] font-black text-xs tracking-widest">
-                          ★ {r.rating || r.author_details?.rating || "?"}
+                           ★ {r.rating || r.author_details?.rating || "?"}
                         </span>
                         {(r.userName || r.username) && (
                           <button 
@@ -279,13 +271,12 @@ const MovieDetails = () => {
               );
             }) : (
               <div className="col-span-2 py-12 text-center bg-white/[0.02] rounded-2xl border border-dashed border-white/10">
-                <p className="text-neutral-600 font-bold uppercase tracking-widest text-xs font-black italic">No Reviews Found...</p>
+                <p className="text-neutral-600 font-black uppercase tracking-widest text-xs italic">no reviews found...</p>
               </div>
             )}
           </div>
         </section>
 
-        {/* Similar Movies */}
         <section className="mt-20">
           <MovieCard
             title="Neural Matches"
@@ -295,7 +286,6 @@ const MovieDetails = () => {
         </section>
       </div>
 
-      {/* Modals */}
       <AnimatePresence>
         {reportingReview && (
           <ReportModal review={reportingReview} onClose={() => setReportingReview(null)} />

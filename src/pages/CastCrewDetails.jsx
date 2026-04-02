@@ -13,6 +13,7 @@ const CastCrewDetails = () => {
   const [credits, setCredits] = useState(null);
   const [movie, setMovie] = useState(null);
 
+  // fetch movie data and credits on mount or id change
   useEffect(() => {
     Promise.all([fetchMovieCredits(id), fetchMovieDetails(id)]).then(
       ([creditsData, movieData]) => {
@@ -23,17 +24,19 @@ const CastCrewDetails = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [id]);
 
+  // loading state centered in viewport
   if (!credits || !movie) return (
     <div className="flex justify-center items-center h-[60vh]">
       <FadeLoader color="#FFC509" />
     </div>
   );
 
-  // Animation variants for staggered list entry
+  // stagger children animations for the cast grid
   const containerVars = {
     animate: { transition: { staggerChildren: 0.05 } }
   };
 
+  // individual item entrance animation
   const itemVars = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 }
@@ -45,7 +48,7 @@ const CastCrewDetails = () => {
       animate={{ opacity: 1 }}
       className="relative min-h-screen text-white pb-20"
     >
-      {/* Cinematic Background integration with RootLayout */}
+      {/* cinematic background integration with dynamic movie backdrop */}
       <div className="absolute -top-26 left-0 lg:-left-10 w-[100vw] h-[400px] pointer-events-none overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 blur-3xl scale-110"
@@ -54,22 +57,25 @@ const CastCrewDetails = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0a]" />
       </div>
 
-      <div className="relative z-10 lg:px-0 px-2">
-        <GoBackBtn />
+      <div className="relative z-10 lg:px-0 px-4 max-w-7xl mx-auto">
+        <div className="pt-6">
+            <GoBackBtn />
+        </div>
 
+        {/* page header with movie title and theme-based label */}
         <header className="mt-8 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{movie.title}</h2>
-          <div className="flex items-center gap-3 mt-2">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tighter italic">{movie.title}</h2>
+          <div className="flex items-center gap-3 mt-4">
             <div className="h-1 w-8 bg-[#FFC509] rounded-full" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-500">Manifest: Cast & Crew</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500">Manifest: Cast & Crew</p>
           </div>
         </header>
 
-        {/* Cast Section */}
-        <section className="mb-16">
-          <div className="flex items-center gap-4 mb-8">
-            <h3 className="text-xl font-bold">Field Operatives</h3>
-            <span className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-neutral-400 font-bold">
+        {/* cast section: "field operatives" grid */}
+        <section className="mb-20">
+          <div className="flex items-center gap-4 mb-10">
+            <h3 className="text-2xl font-black tracking-tight uppercase italic">Field Operatives</h3>
+            <span className="text-[10px] bg-[#FFC509]/10 border border-[#FFC509]/20 px-2 py-0.5 rounded-full text-[#FFC509] font-black">
               {credits.cast.length}
             </span>
           </div>
@@ -87,26 +93,27 @@ const CastCrewDetails = () => {
                 onClick={() => navigate(`/person/${person.id}`)}
                 className="group cursor-pointer"
               >
-                <div className="relative overflow-hidden rounded-2xl aspect-[3/4] mb-3 border border-white/5 group-hover:border-[#FFC509]/50 transition-all duration-300">
+                {/* profile image with hover scaling and border effect */}
+                <div className="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-4 border border-white/5 group-hover:border-[#FFC509]/50 transition-all duration-500 shadow-2xl">
                   <img
                     src={person.profile_path ? `https://image.tmdb.org/t/p/w342${person.profile_path}` : userPlaceholder}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     alt={person.name}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <p className="font-bold text-sm truncate group-hover:text-[#FFC509] transition-colors">{person.name}</p>
-                <p className="text-[11px] text-neutral-500 italic truncate">{person.character}</p>
+                <p className="text-[11px] text-neutral-500 font-medium truncate mt-0.5">{person.character}</p>
               </motion.div>
             ))}
           </motion.div>
         </section>
 
-        {/* Crew Section - Glassmorphism style */}
+        {/* crew section: "technical support" glassmorphism list */}
         <section>
-          <div className="flex items-center gap-4 mb-8">
-            <h3 className="text-xl font-bold">Technical Support</h3>
-            <span className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-neutral-400 font-bold">
+          <div className="flex items-center gap-4 mb-10">
+            <h3 className="text-2xl font-black tracking-tight uppercase italic">Technical Support</h3>
+            <span className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-full text-neutral-400 font-bold">
               {credits.crew.length}
             </span>
           </div>
@@ -115,19 +122,24 @@ const CastCrewDetails = () => {
             {credits.crew.map((person, index) => (
               <motion.div
                 key={`${person.id}-${person.job}-${index}`}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 onClick={() => navigate(`/person/${person.id}`)}
-                className="bg-white/[0.02] border border-white/5 p-4 rounded-xl hover:bg-white/[0.05] hover:border-white/10 transition-all cursor-pointer group"
+                className="bg-white/[0.03] backdrop-blur-xl border border-white/5 p-5 rounded-[1.5rem] hover:bg-white/[0.07] hover:border-[#FFC509]/30 transition-all cursor-pointer group flex flex-col justify-center"
               >
-                <p className="font-bold text-sm group-hover:text-[#FFC509] transition-colors">{person.name}</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mt-1">{person.job}</p>
+                <p className="font-bold text-base group-hover:text-[#FFC509] transition-colors">{person.name}</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500 mt-2 flex items-center gap-2">
+                  <span className="w-1 h-1 bg-[#FFC509] rounded-full group-hover:animate-pulse" />
+                  {person.job}
+                </p>
               </motion.div>
             ))}
           </div>
         </section>
       </div>
+
+      {/* utility components */}
       <ScrollToTopButton />
     </motion.div>
   );

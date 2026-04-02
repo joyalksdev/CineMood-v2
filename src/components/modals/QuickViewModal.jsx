@@ -13,22 +13,44 @@ const QuickViewModal = ({ movie, onClose }) => {
   const [openReview, setOpenReview] = useState(false);
 
   // --- DATA FIXES ---
-  const backdrop = movie.backdrop_path?.trim();
-  
-  // 1. Use 'rating' if 'vote_average' doesn't exist (Matches your console log)
-  const displayRating = movie.rating.toFixed(1) || movie.vote_average .toFixed(1)|| 0;
-  
-  // 2. Adjust Trending logic: If popularity is missing, use a fallback or lower threshold
-  const isTrending = movie.popularity > 500 || movie.media_type === "movie"; 
+  const backdrop = movie?.backdrop_path?.trim();
+
+  // Use optional chaining and a fallback to 0 before calling toFixed
+  const rawRating = movie?.rating ?? movie?.vote_average ?? 0;
+  const displayRating = Number(rawRating).toFixed(1);
+
+  // Ensure popularity is a number
+  const isTrending =
+    Number(movie?.popularity) > 500 || movie?.media_type === "movie";
 
   // 3. Genre Map
-  const genreMap = { 28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime", 99: "Doc", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 10770: "TV", 53: "Thriller", 10752: "War", 37: "Western" };
+  const genreMap = {
+    28: "Action",
+    12: "Adventure",
+    16: "Animation",
+    35: "Comedy",
+    80: "Crime",
+    99: "Doc",
+    18: "Drama",
+    10751: "Family",
+    14: "Fantasy",
+    36: "History",
+    27: "Horror",
+    10402: "Music",
+    9648: "Mystery",
+    10749: "Romance",
+    878: "Sci-Fi",
+    10770: "TV",
+    53: "Thriller",
+    10752: "War",
+    37: "Western",
+  };
 
   // 4. FIX: If genre_ids is missing in the object, show a default or check 'genres' array
-  const genresToDisplay = movie.genre_ids 
-    ? movie.genre_ids.slice(0, 3).map(id => genreMap[id]) 
-    : movie.genres 
-      ? movie.genres.slice(0, 3).map(g => g.name)
+  const genresToDisplay = movie.genre_ids
+    ? movie.genre_ids.slice(0, 3).map((id) => genreMap[id])
+    : movie.genres
+      ? movie.genres.slice(0, 3).map((g) => g.name)
       : ["Movie"]; // Fallback if both are missing
 
   useEffect(() => {
@@ -66,7 +88,11 @@ const QuickViewModal = ({ movie, onClose }) => {
 
             <div className="relative h-[280px] md:h-[320px]">
               <img
-                src={backdrop ? `https://image.tmdb.org/t/p/original${backdrop}` : mHPlaceholder}
+                src={
+                  backdrop
+                    ? `https://image.tmdb.org/t/p/original${backdrop}`
+                    : mHPlaceholder
+                }
                 className="w-full h-full object-cover"
                 alt={movie.title}
               />
@@ -84,7 +110,7 @@ const QuickViewModal = ({ movie, onClose }) => {
                       Trending
                     </span>
                   )}
-                  
+
                   {/* Recommended Badge (Using corrected displayRating) */}
                   {displayRating >= 7 && (
                     <span className="bg-green-500 text-black text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-tighter shadow-xl flex items-center gap-1">
@@ -96,7 +122,7 @@ const QuickViewModal = ({ movie, onClose }) => {
                     {movie.release_date?.split("-")[0]}
                   </span>
                 </div>
-                
+
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-[0.85] italic drop-shadow-2xl">
                   {movie.title}
                 </h2>
@@ -104,12 +130,11 @@ const QuickViewModal = ({ movie, onClose }) => {
             </div>
 
             <div className="px-10 py-8 bg-[#0b0b0b]">
-              
               {/* Genres Row (Using corrected genresToDisplay) */}
               <div className="flex flex-wrap gap-2 mb-5">
                 {genresToDisplay.map((name, index) => (
-                  <span 
-                    key={index} 
+                  <span
+                    key={index}
                     className="text-[10px] px-3 py-1 rounded-full bg-white/5 border border-white/10 text-yellow-400/80 font-bold uppercase tracking-widest"
                   >
                     {name}
@@ -141,7 +166,12 @@ const QuickViewModal = ({ movie, onClose }) => {
                 </button>
               </div>
 
-              {openReview && <ReviewModal movie={movie} onClose={() => setOpenReview(false)} />}
+              {openReview && (
+                <ReviewModal
+                  movie={movie}
+                  onClose={() => setOpenReview(false)}
+                />
+              )}
             </div>
           </motion.div>
         </motion.div>
