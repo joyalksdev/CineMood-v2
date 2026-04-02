@@ -1,4 +1,6 @@
-# 🎥 CineMood // Movie Discovery Platform
+# 🎥 CineMood V2 // Movie Discovery Platform
+
+**Live Link**: https://cinemood-v2.vercel.app/
 
 **CineMood** is a web application designed to solve the problem of *choice paralysis*.
 Instead of endlessly scrolling through movie lists, users can discover films based on their current mood and interests using AI.
