@@ -90,4 +90,5 @@ To create a streamlined movie discovery experience that uses AI to bridge the ga
 ---
 
 **With ❤️, Joyal**
+
 Developer and Artitect CineMood
