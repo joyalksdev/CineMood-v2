@@ -59,14 +59,80 @@ const WeeklySpotlight = () => {
     </div>
   );
 
-  if (evolutionData?.empty) return (
-    /* ... Your existing Empty State logic remains clean ... */
-    <section ref={sectionRef} className="w-full max-w-7xl mx-auto px-4 mb-12">
-        <div className="bg-neutral-900/40 rounded-[2.5rem] border border-white/5 p-12 md:p-20 text-center">
-            <h2 className="text-3xl md:text-5xl font-black text-white italic mb-6">Engine <span className="text-[#FFC509]">Offline</span></h2>
-            <p className="text-white/40 mb-10 max-w-md mx-auto text-sm">Add {5 - (watchlist?.length || 0)} more movies to your watchlist to generate your weekly evolution.</p>
-            <button onClick={() => navigate("/browse")} className="px-8 py-4 bg-[#FFC509] text-black font-black uppercase text-xs rounded-xl hover:scale-105 transition-transform">Get Started</button>
+ if (evolutionData?.empty)
+  return (
+    <section
+      id="spotlight-section"
+      ref={sectionRef}
+      className="w-full max-w-5xl mx-auto px-4 mb-10" // Reduced max-width and margin
+    >
+      <div className="relative bg-neutral-900/40 rounded-[2rem] border border-white/5 p-6 md:p-12 overflow-hidden shadow-2xl backdrop-blur-md">
+        {/* Background Decorative Element - Scaled down */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-[#FFC509]/5 rounded-full blur-[80px]" />
+
+        <div className="relative z-10 flex flex-col items-center text-center max-w-xl mx-auto">
+          {/* Header Label - Tighter */}
+          <div className="flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-green-400/10 border border-green-400/20 mb-4">
+            <Sparkles className="text-green-400" size={8} />
+            <span className="text-green-400 text-[8px] font-black uppercase tracking-[0.2em]">
+              AI Neural Engine v2.5
+            </span>
+          </div>
+
+          <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter italic leading-none mb-4">
+            Weekly <span className="text-[#FFC509]">Spotlight</span>
+          </h2>
+
+          <p className="text-white/50 text-xs md:text-sm font-medium leading-relaxed mb-8">
+            The <span className="text-white">Weekly Spotlight</span> is a
+            personalized cinematic evolution. To calibrate your profile, we 
+            need more fuel for the engine.
+          </p>
+
+          {/* Progress System - More Compact */}
+          <div className="w-full bg-black/40 p-6 rounded-[1.5rem] border border-white/5 mb-8">
+            <div className="flex justify-between items-end mb-3">
+              <div className="text-left">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FFC509]">
+                  Calibration
+                </p>
+                <h4 className="text-white text-base font-bold italic">
+                  Engine Progress
+                </h4>
+              </div>
+              <span className="text-xl font-black italic text-white tracking-tighter">
+                {watchlist?.length || 0}
+                <span className="text-white/20">/</span>5
+              </span>
+            </div>
+
+            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                className="h-full bg-[#FFC509] rounded-full shadow-[0_0_15px_#FFC509] relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              </motion.div>
+            </div>
+
+            <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mt-4">
+              Add {Math.max(5 - (watchlist?.length || 0), 0)} more movies to your watchlist to ignite the engine."
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate("/browse")}
+            className="group flex items-center gap-3 px-8 py-4 bg-[#FFC509] text-black font-black uppercase text-[10px] tracking-[0.2em] rounded-xl transition-all hover:scale-105 active:scale-95"
+          >
+            Find Your Fuel{" "}
+            <ArrowRight
+              size={14}
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          </button>
         </div>
+      </div>
     </section>
   );
 
@@ -81,9 +147,9 @@ const WeeklySpotlight = () => {
           {/* Top Label Row */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10">
-                <Sparkles className="text-[#FFC509]" size={10} />
-                <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">Neural Engine v2.5</span>
+               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-400/[0.03] border border-green-400/10">
+                <Sparkles className="text-green-400" size={10} />
+                <span className="text-green-400 text-[9px] font-black uppercase tracking-[0.2em]">Neural Engine v2.5</span>
               </div>
               <InfoTooltip title="Neural Evolution" content="A theme synthesized weekly from your unique viewing habits." />
             </div>
@@ -100,7 +166,7 @@ const WeeklySpotlight = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 space-y-4">
               <h3 className="text-lg md:text-xl font-bold italic text-white/40 uppercase tracking-tighter">Weekly Spotlight</h3>
-              <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
+              <h2 className="text-4xl md:text-7xl font-bold text-white tracking-tighter leading-[0.9] uppercase italic">
                 {evolutionData.themeTitle}
               </h2>
               <p className="text-white/50 text-base md:text-lg font-medium leading-relaxed max-w-xl">
