@@ -8,15 +8,16 @@ const ReportModal = ({ review, onClose }) => {
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // pre-set report reasons
   const reasons = ["Spam", "Inappropriate Language", "Spoilers", "Other"];
 
   const handleReport = async () => {
+    // validation check before hitting the api
     if (!reason) return toast.error("Please select a reason");
 
     setSubmitting(true);
     try {
-      // review.id comes from our TMDB or Local Review object
-      // Note: ensure review.id is the MongoDB _id for local reviews
+      // sends report using either mongo id or tmdb id
       await reportReview(review._id || review.id, reason);
 
       toast.success("Review reported for moderation 🛡️");
@@ -30,12 +31,14 @@ const ReportModal = ({ review, onClose }) => {
   };
 
   return (
+    // dark blurred overlay with fade animation
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/80 backdrop-blur-xl flex justify-center items-center z-[150] p-4"
     >
+      {/* modal card with scaling effect */}
       <motion.div
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
@@ -62,6 +65,7 @@ const ReportModal = ({ review, onClose }) => {
           ?
         </p>
 
+        {/* clickable reason buttons list */}
         <div className="space-y-2 mb-8">
           {reasons.map((r) => (
             <button
@@ -78,6 +82,7 @@ const ReportModal = ({ review, onClose }) => {
           ))}
         </div>
 
+        {/* main submit action button */}
         <button
           disabled={submitting}
           onClick={handleReport}

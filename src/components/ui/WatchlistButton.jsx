@@ -2,10 +2,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import { GoPlus } from "react-icons/go"
 import { IoCheckmark } from "react-icons/io5"
 import { useWatchlist } from "../../context/WatchlistContext"
-import Tooltip from "../ui/Tooltip" // Using your custom tooltip
+import Tooltip from "../ui/Tooltip" // Using custom tooltip
 
 const sizes = {
-  card: "w-10 h-10 text-xl", // Increased slightly to match our new h-10 Info buttons
+  card: "w-10 h-10 text-xl", 
   modal: "w-12 h-12 text-2xl",
   details: "w-14 h-14 text-3xl"
 }

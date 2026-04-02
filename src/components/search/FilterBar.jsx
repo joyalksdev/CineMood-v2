@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react"
-import { HiChevronDown } from "react-icons/hi"
+import { useEffect, useRef, useState } from "react";
+import { HiChevronDown } from "react-icons/hi";
 
+// static data for categories and filter options
 const GENRES = [
   { id: "", name: "All Genres" },
   { id: "28", name: "Action" },
@@ -9,7 +10,7 @@ const GENRES = [
   { id: "878", name: "Sci-Fi" },
   { id: "18", name: "Drama" },
   { id: "10749", name: "Romance" },
-]
+];
 
 const LANGUAGES = [
   { id: "", name: "All Languages" },
@@ -18,37 +19,39 @@ const LANGUAGES = [
   { id: "hi", name: "Hindi" },
   { id: "ta", name: "Tamil" },
   { id: "te", name: "Telugu" },
-]
+];
 
 const SORTS = [
   { id: "rating", name: "Top Rated" },
   { id: "new", name: "Latest" },
   { id: "old", name: "Oldest" }
-]
+];
 
 const FilterBar = ({ filters, setFilters }) => {
-  const [open, setOpen] = useState(null)
-  const dropdownRef = useRef(null)
+  const [open, setOpen] = useState(null);
+  const dropdownRef = useRef(null);
 
+  // closes any open dropdown when clicking outside the component
   useEffect(() => {
     const handler = e => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(null)
+        setOpen(null);
       }
-    }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
-  }, [])
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
+  // updates the global filter state and resets pagination to page 1
   const updateFilter = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value, page: 1 }))
-    setOpen(null)
-  }
+    setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
+    setOpen(null);
+  };
 
   return (
     <div ref={dropdownRef} className="flex flex-wrap gap-3 relative">
       
-      {/* Sort Dropdown */}
+      {/* sorting dropdown logic */}
       <div className="relative">
         <button
           onClick={() => setOpen(open === "sort" ? null : "sort")}
@@ -73,7 +76,7 @@ const FilterBar = ({ filters, setFilters }) => {
         )}
       </div>
 
-      {/* Genre Dropdown */}
+      {/* genre selection dropdown */}
       <div className="relative">
         <button
           onClick={() => setOpen(open === "genre" ? null : "genre")}
@@ -98,7 +101,7 @@ const FilterBar = ({ filters, setFilters }) => {
         )}
       </div>
 
-      {/* Language Dropdown */}
+      {/* language filter dropdown */}
       <div className="relative">
         <button
           onClick={() => setOpen(open === "lang" ? null : "lang")}
@@ -124,7 +127,7 @@ const FilterBar = ({ filters, setFilters }) => {
       </div>
 
     </div>
-  )
-}
+  );
+};
 
-export default FilterBar
+export default FilterBar;

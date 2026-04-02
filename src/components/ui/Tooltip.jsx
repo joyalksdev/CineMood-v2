@@ -63,7 +63,6 @@ const Tooltip = ({ children, text, delay = 0, active = true }) => {
 
   return (
     <>
-      {/* Wrapper MUST stay inline-block to not break your grid/flex layouts */}
       <div
         ref={triggerRef}
         onMouseEnter={handleMouseEnter}

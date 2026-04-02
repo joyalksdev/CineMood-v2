@@ -10,6 +10,7 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
   const [loading, setLoading] = useState(true)
   const rowRef = useRef(null)
 
+  // fetching movies on mount and handling memory leaks with isMounted
   useEffect(() => {
     let isMounted = true
     setLoading(true)
@@ -22,6 +23,7 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
     return () => { isMounted = false }
   }, [fetchFn])
 
+  // smooth horizontal scroll logic for the movie row
   const scroll = (direction) => {
     if (rowRef.current) {
       const width = rowRef.current.clientWidth * 0.8
@@ -34,7 +36,7 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
 
   return (
     <section className="py-10">
-      {/* Header: Clean & Bold */}
+      {/* section title and scroll buttons */}
       <div className="flex justify-between items-end mb-6 px-4 md:px-10">
         <div className="space-y-1">
           <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight italic">
@@ -43,7 +45,6 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
           <div className="h-1 w-12 bg-green-400 rounded-full" />
         </div>
 
-        {/* Custom Scroll Controls */}
         <div className="hidden lg:flex gap-2">
           <button
             onClick={() => scroll("left")}
@@ -60,12 +61,13 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
         </div>
       </div>
 
-      {/* Row Container */}
+      {/* movie list container with snap scrolling */}
       <div 
         ref={rowRef} data-lenis-prevent 
         className="flex gap-5 md:gap-7 overflow-x-auto scrollbar-hide px-4 md:px-10 py-4 snap-x"
       >
         {loading ? (
+           // skeleton loaders while data is fetching
            [...Array(6)].map((_, i) => (
             <div key={i} className="min-w-[160px] md:min-w-[240px] aspect-[2/3] bg-white/5 rounded-3xl animate-pulse border border-white/5" />
           ))
@@ -83,8 +85,6 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
                 className="group flex flex-col min-w-[160px] md:min-w-[230px] snap-start cursor-pointer relative"
                 onClick={() => onSelectMovie(movie)}
               >
-                {/* Image Container */}
-                
                 <div className="relative aspect-[2/3] rounded-[2rem] overflow-hidden bg-neutral-900 border border-white/10 transition-all duration-500 group-hover:border-[#FFC509]/50 shadow-lg">
                   <img
                     src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
@@ -93,15 +93,13 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
                     loading="lazy"
                   />
 
-                  {/* Hover Actions: Clean & Spacious */}
+                  {/* hover overlay with info and watchlist actions */}
                   <div className="absolute inset-0 flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
                     <div className="flex items-center gap-3">
-                      {/* Info Button: White Glassmorphism */}
                       <button className="flex-1 h-12 bg-white text-black text-[11px] font-bold uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all active:scale-95">
                         <Info size={18} /> Info
                       </button>
                       
-                      {/* Watchlist Button: Updated to use your Green-400 accent for active state */}
                       <div className="shrink-0">
                         <WatchlistButton 
                           movie={movie} 
@@ -113,10 +111,9 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
                   </div>
                 </div>
 
-                {/* Metadata Section: Fixing the Overlap & Spacing */}
+                {/* movie details section */}
                 <div className="mt-4 px-2 overflow-hidden"> 
                     <Tooltip text={movie.title} active={movie.title?.length > 20}>
-                      {/* truncate handles the "..." and block ensures it takes full width */}
                       <h3 className="text-[14px] md:text-[15px] font-bold text-white truncate block w-full group-hover:text-[#FFC509] transition-colors duration-300">
                         {movie.title}
                       </h3>
@@ -129,7 +126,6 @@ const MovieCard = ({ title, fetchFn, onSelectMovie }) => {
                       
                       <span className="w-1 h-1 rounded-full bg-neutral-800 shrink-0" />
                       
-                      {/* Using your brand Green-400 for the type tag */}
                       <p className="text-[10px] text-green-400 font-bold uppercase tracking-wider truncate">
                         {movie.media_type || 'Movie'}
                       </p>

@@ -9,7 +9,7 @@ export const WatchlistProvider = ({ children }) => {
   const { user, saveUser } = useUser();
   const [watchlist, setWatchlist] = useState([]);
 
-  // Sync local state with UserContext whenever user changes
+  // sync local state with UserContext whenever the logged-in user changes
   useEffect(() => {
     if (user?.watchlist) {
       setWatchlist(user.watchlist);
@@ -18,41 +18,44 @@ export const WatchlistProvider = ({ children }) => {
     }
   }, [user]);
 
+  // add movie to database and update global user state
   const addToWatchlist = async (movie) => {
     try {
-      // We send the whole movie object to MongoDB
+      // POST the movie object to your MongoDB backend
       const response = await api.post("/watchlist/add", { movie });
       
-      // Backend returns the updated array: res.status(200).json(user.watchlist)
+      // we assume backend returns the full updated watchlist array
       const updatedWatchlist = response.data;
       
       setWatchlist(updatedWatchlist);
       
-      // CRITICAL: Update UserContext so LocalStorage and Header counts stay accurate
-      saveUser({ ...user, watchlist: updatedWatchlist });
+      // update UserContext to keep LocalStorage and Header counts in sync
+      saveUser({ ...user, watchlist: updatedWatchlist }, !!localStorage.getItem("cinemood_user"));
       
-      toast.success(`${movie.title} added!`);
+      toast.success(`${movie.title.toLowerCase()} added!`, {
+        style: { background: '#171717', color: '#fff', fontSize: '12px', fontWeight: 'bold' }
+      });
     } catch (err) {
-      console.error("Add error:", err);
-      toast.error("Failed to add to watchlist");
+      console.error("add error:", err);
+      toast.error("failed to add to watchlist");
     }
   };
 
+  // remove movie by ID and sync the remaining list
   const removeFromWatchlist = async (movieId) => {
     try {
       const response = await api.delete(`/watchlist/${movieId}`);
-      
       const updatedWatchlist = response.data;
       
       setWatchlist(updatedWatchlist);
       
-      // CRITICAL: Update UserContext
-      saveUser({ ...user, watchlist: updatedWatchlist });
+      // update UserContext so the change persists across refreshes
+      saveUser({ ...user, watchlist: updatedWatchlist }, !!localStorage.getItem("cinemood_user"));
       
-      toast.success("Removed from watchlist");
+      toast.success("removed from watchlist");
     } catch (err) {
-      console.error("Remove error:", err);
-      toast.error("Failed to remove");
+      console.error("remove error:", err);
+      toast.error("failed to remove");
     }
   };
 

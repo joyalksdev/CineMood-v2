@@ -13,7 +13,7 @@ import api from "../../services/axios";
 import QuickViewModal from "../modals/QuickViewModal";
 import InfoTooltip from "../ui/InfoTooltip";
 import { useWatchlist } from "../../context/WatchlistContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const WeeklySpotlight = () => {
   const [evolutionData, setEvolutionData] = useState(null);
@@ -30,28 +30,12 @@ const WeeklySpotlight = () => {
     fetchSpotlight();
   }, []);
 
-  useEffect(() => {
-    if (!isLoading && evolutionData && location.state?.scrollToSpotlight) {
-      setTimeout(() => {
-        sectionRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }, 500);
-    }
-  }, [isLoading, evolutionData, location.state]);
-
   const fetchSpotlight = async () => {
     setIsLoading(true);
     try {
       const { data } = await api.get("/ai/weekly-spotlight");
-      if (data.success && data.movies?.length > 0) {
-        setEvolutionData(data);
-      } else {
-        setEvolutionData({ empty: true });
-      }
+      setEvolutionData(data.success && data.movies?.length > 0 ? data : { empty: true });
     } catch (err) {
-      console.error("Spotlight Sync Failed", err);
       setEvolutionData({ empty: true });
     } finally {
       setIsLoading(false);
@@ -60,234 +44,135 @@ const WeeklySpotlight = () => {
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollAmount = clientWidth * 0.8;
-      const scrollTo =
-        direction === "left"
-          ? scrollLeft - scrollAmount
-          : scrollLeft + scrollAmount;
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+      const amt = scrollRef.current.clientWidth * 0.8;
+      scrollRef.current.scrollBy({ 
+        left: direction === "left" ? -amt : amt, 
+        behavior: "smooth" 
+      });
     }
   };
 
-  if (isLoading)
-    return (
-      <div className="w-full max-w-7xl mx-auto px-4 py-20 flex flex-col items-center justify-center">
-        <div className="relative">
-          <Loader2 className="animate-spin text-[#FFC509]" size={40} />
-          <Sparkles
-            className="absolute -top-1 -right-1 text-[#FFC509] animate-pulse"
-            size={16}
-          />
+  if (isLoading) return (
+    <div className="w-full max-w-7xl mx-auto px-4 py-24 flex flex-col items-center justify-center">
+      <Loader2 className="animate-spin text-[#FFC509] mb-4" size={32} />
+      <p className="text-white/20 text-[10px] tracking-[0.4em] uppercase font-black">Neural Sync in Progress</p>
+    </div>
+  );
+
+  if (evolutionData?.empty) return (
+    /* ... Your existing Empty State logic remains clean ... */
+    <section ref={sectionRef} className="w-full max-w-7xl mx-auto px-4 mb-12">
+        <div className="bg-neutral-900/40 rounded-[2.5rem] border border-white/5 p-12 md:p-20 text-center">
+            <h2 className="text-3xl md:text-5xl font-black text-white italic mb-6">Engine <span className="text-[#FFC509]">Offline</span></h2>
+            <p className="text-white/40 mb-10 max-w-md mx-auto text-sm">Add {5 - (watchlist?.length || 0)} more movies to your watchlist to generate your weekly evolution.</p>
+            <button onClick={() => navigate("/browse")} className="px-8 py-4 bg-[#FFC509] text-black font-black uppercase text-xs rounded-xl hover:scale-105 transition-transform">Get Started</button>
         </div>
-        <p className="text-white/40 mt-6 text-[10px] tracking-[0.3em] uppercase font-bold text-center">
-          Syncing Neural Data...
-        </p>
-      </div>
-    );
-
-  // Replace your existing evolutionData?.empty block with this "Fire" version:
-
-  if (evolutionData?.empty)
-    return (
-      <section
-        id="spotlight-section"
-        ref={sectionRef}
-        className="w-full max-w-7xl mx-auto px-4 mb-12"
-      >
-        <div className="relative bg-neutral-900/40 rounded-[2.5rem] border border-white/5 p-8 md:p-20 overflow-hidden shadow-2xl backdrop-blur-md">
-          {/* Background Decorative Element */}
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-[#FFC509]/5 rounded-full blur-[120px]" />
-
-          <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
-            {/* Header Label */}
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFC509]/10 border border-[#FFC509]/20 mb-6">
-              <Sparkles className="text-[#FFC509]" size={10} />
-              <span className="text-[#FFC509] text-[9px] font-black uppercase tracking-[0.2em]">
-                AI Neural Engine v2.5
-              </span>
-            </div>
-
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter italic leading-none mb-6">
-              Weekly <span className="text-[#FFC509]">Spotlight</span>
-            </h2>
-
-            <p className="text-white/50 text-sm md:text-base font-medium leading-relaxed mb-10">
-              The <span className="text-white">Weekly Spotlight</span> is a
-              personalized cinematic evolution generated by our AI. To calibrate
-              your neural profile and unlock this week's curated theme, we need
-              more fuel for the engine.
-            </p>
-
-            {/* Progress System */}
-            <div className="w-full bg-black/40 p-8 rounded-[2rem] border border-white/5 mb-10">
-              <div className="flex justify-between items-end mb-4">
-                <div className="text-left">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FFC509]">
-                    System Calibration
-                  </p>
-                  <h4 className="text-white text-lg font-bold italic">
-                    Engine Progress
-                  </h4>
-                </div>
-                <span className="text-2xl font-black italic text-white tracking-tighter">
-                  {watchlist?.length || 0}
-                  <span className="text-white/20">/</span>5
-                </span>
-              </div>
-
-              <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden p-1 border border-white/5">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  className="h-full bg-[#FFC509] rounded-full shadow-[0_0_20px_#FFC509] relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                </motion.div>
-              </div>
-
-              <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-6">
-                Add {Math.max(5 - (watchlist?.length || 0), 0)} more movies to
-                your watchlist to ignite.
-              </p>
-            </div>
-
-            <button
-              onClick={() => navigate("/browse")}
-              className="group flex items-center gap-4 px-10 py-5 bg-[#FFC509] text-black font-black uppercase text-xs tracking-[0.2em] rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_#FFC509/20] active:scale-95"
-            >
-              Find Your Fuel{" "}
-              <ArrowRight
-                size={18}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </button>
-          </div>
-        </div>
-      </section>
-    );
+    </section>
+  );
 
   return (
-    <section
-      ref={sectionRef}
-      className="w-full max-w-7xl mx-auto px-4 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700"
-    >
-      <div className="relative bg-gradient-to-br from-neutral-900 to-black rounded-[2.5rem] border border-white/5 p-6 md:p-12 shadow-2xl overflow-hidden">
-        {/* Subtle Background Glow */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-[#FFC509]/5 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+    <section ref={sectionRef} className="w-full max-w-7xl mx-auto px-4 mb-20 animate-in fade-in duration-1000">
+      <div className="relative bg-[#0A0A0A] rounded-[3rem] border border-white/5 p-6 md:p-14 shadow-2xl overflow-hidden">
+        
+        {/* Aesthetic Background Element */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FFC509]/5 blur-[120px] rounded-full -mr-48 -mt-48 pointer-events-none" />
 
-        <header className="relative z-10 mb-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            <div className="space-y-4 max-w-3xl">
-              {/* --- NEW BRAND TITLE SECTION --- */}
-              <div className="flex flex-wrap items-center gap-4 mb-2">
-                <div className="flex items-center gap-3">
-                  <h3 className="text-xl md:text-2xl font-bold italic tracking-tight text-white uppercase leading-none">
-                    Weekly <span className="text-[#FFC509]">Spotlight</span>
-                  </h3>
-                  <div className="h-4 w-[1px] bg-white/10 hidden md:block" />
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/5">
-                    <Sparkles className="text-[#FFC509]" size={10} />
-                    <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">
-                      AI Neural Engine v2.5
-                    </span>
-                  </div>
-                </div>
-
-                <InfoTooltip
-                  title="Neural Evolution"
-                  content="Every 7 days, the engine synthesizes a new theme based on your watchlist DNA and mood history."
-                />
+        <header className="relative z-10 mb-12">
+          {/* Top Label Row */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10">
+                <Sparkles className="text-[#FFC509]" size={10} />
+                <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">Neural Engine v2.5</span>
               </div>
+              <InfoTooltip title="Neural Evolution" content="A theme synthesized weekly from your unique viewing habits." />
+            </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-2">
+                <button onClick={() => scroll("left")} className="p-3 rounded-full bg-white/5 text-white/40 hover:bg-[#FFC509] hover:text-black transition-all"><ChevronLeft size={18}/></button>
+                <button onClick={() => scroll("right")} className="p-3 rounded-full bg-white/5 text-white/40 hover:bg-[#FFC509] hover:text-black transition-all"><ChevronRight size={18}/></button>
+                <button onClick={fetchSpotlight} className="p-3 text-white/20 hover:text-[#FFC509] transition-colors"><History size={18}/></button>
+            </div>
+          </div>
 
-              {/* Dynamic Theme Title from AI */}
-              <h2 className="text-4xl md:text-7xl font-bold text-white tracking-tight leading-[0.95] drop-shadow-sm">
+          {/* Main Heading & AI Insight Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-7 space-y-4">
+              <h3 className="text-lg md:text-xl font-bold italic text-white/40 uppercase tracking-tighter">Weekly Spotlight</h3>
+              <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
                 {evolutionData.themeTitle}
               </h2>
-
-              <p className="text-white/50 text-base md:text-lg font-medium max-w-2xl leading-relaxed">
+              <p className="text-white/50 text-base md:text-lg font-medium leading-relaxed max-w-xl">
                 {evolutionData.themeDescription}
               </p>
-
-              {evolutionData.aiInsight && (
-                <div className="flex items-start gap-3 bg-[#FFC509]/5 p-4 rounded-2xl border border-[#FFC509]/10 backdrop-blur-sm max-w-xl">
-                  <BrainCircuit
-                    className="text-[#FFC509] shrink-0 mt-1"
-                    size={16}
-                  />
-                  <p className="text-xs md:text-sm font-medium text-[#FFC509]/80 leading-relaxed italic">
-                    <span className="text-[#FFC509] font-black uppercase text-[10px] tracking-widest not-italic block mb-1">
-                      AI Analysis:
-                    </span>
-                    "{evolutionData.aiInsight}"
-                  </p>
-                </div>
-              )}
             </div>
 
-            {/* Navigation Controls */}
-            <div className="flex items-center gap-3 self-end md:self-auto pb-2">
-              <div className="flex items-center gap-1 bg-black/20 p-1.5 rounded-full border border-white/5 backdrop-blur-md">
-                <button
-                  onClick={() => scroll("left")}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white/40 hover:bg-[#FFC509] hover:text-black transition-all"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button
-                  onClick={() => scroll("right")}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white/40 hover:bg-[#FFC509] hover:text-black transition-all"
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-              <button
-                onClick={() => fetchSpotlight()}
-                className="p-4 rounded-full bg-white/5 text-white/40 hover:text-[#FFC509] transition-colors border border-white/5"
-              >
-                <History size={18} />
-              </button>
+            {/* AI Insight Box - Now sits to the side on Desktop */}
+            <div className="lg:col-span-5">
+              <AnimatePresence mode="wait">
+                {evolutionData.aiInsight && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="h-full flex items-start gap-4 bg-white/[0.02] p-6 rounded-[2rem] border border-white/5 backdrop-blur-md"
+                  >
+                    <BrainCircuit className="text-[#FFC509] shrink-0" size={20} />
+                    <div className="space-y-2">
+                      <span className="text-[#FFC509] font-black uppercase text-[10px] tracking-widest block">AI Neural Analysis</span>
+                      <p className="text-sm font-medium text-white/60 leading-relaxed italic">
+                        "{evolutionData.aiInsight}"
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>
 
-        {/* ... Rest of your movie mapping code ... */}
-
-        {/* Improved Responsive Grid/Scroll Container */}
+        {/* Scroll Container */}
         <div
           ref={scrollRef}
-          data-lenis-prevent
-          className="flex overflow-x-auto gap-4 md:gap-6 pb-4 scrollbar-hide snap-x touch-pan-x"
+          className="flex overflow-x-auto gap-4 md:gap-8 pb-6 scrollbar-hide snap-x touch-pan-x"
         >
           {evolutionData.movies.map((movie, index) => (
             <div
               key={movie.id || index}
               onClick={() => setSelectedMovie(movie)}
-              className="flex-none w-[120px] sm:w-[200px] md:w-[240px] snap-start group cursor-pointer"
+              className="flex-none w-[160px] sm:w-[170px] md:w-[200px] snap-start group cursor-pointer"
             >
-              <div className="relative aspect-[2/3] rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 group-hover:border-[#FFC509]/40 transition-all duration-500 shadow-xl bg-neutral-800">
+              <div className="relative aspect-[2/3] rounded-[2rem] overflow-hidden border border-white/5 group-hover:border-[#FFC509]/40 transition-all duration-500 shadow-2xl bg-neutral-900">
                 <img
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   alt={movie.title}
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 md:p-6">
-                  <p className="text-white text-sm md:text-base font-bold line-clamp-2 leading-tight">
-                    {movie.title}
-                  </p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                
+                {/* Minimal Label on card */}
+                <div className="absolute bottom-0 left-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                   <p className="text-white text-sm font-bold italic leading-none">{movie.title}</p>
                 </div>
               </div>
-              <div className="mt-3 md:hidden">
-                <p className="text-white text-[11px] font-bold truncate">
-                  {movie.title}
-                </p>
-                <p className="text-white/40 text-[9px] font-black uppercase tracking-tighter mt-0.5">
+              
+              {/* Mobile Info (Visible without hover) */}
+              <div className="mt-4 md:hidden px-2">
+                <p className="text-white text-xs font-bold truncate lowercase italic">{movie.title}</p>
+                <p className="text-white/30 text-[10px] font-black uppercase tracking-widest mt-1">
                   {movie.release_date?.split("-")[0]}
                 </p>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Mobile-Only Navigation Buttons */}
+        <div className="flex md:hidden items-center justify-center gap-6 mt-8 pt-6 border-t border-white/5">
+            <button onClick={() => scroll("left")} className="text-white/20 hover:text-[#FFC509] transition-colors"><ChevronLeft size={24}/></button>
+            <button onClick={fetchSpotlight} className="text-white/10 hover:text-[#FFC509] transition-colors"><History size={20}/></button>
+            <button onClick={() => scroll("right")} className="text-white/20 hover:text-[#FFC509] transition-colors"><ChevronRight size={24}/></button>
         </div>
       </div>
 

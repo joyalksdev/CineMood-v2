@@ -3,8 +3,10 @@ import AdminSidebar from "../admin/AdminSidebar";
 import { useUser } from "../../context/UserContext";
 
 const AdminLayout = () => {
+  // get user and loading state from context
   const { user, loading } = useUser();
 
+  // loading screen while checking auth
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
@@ -18,23 +20,21 @@ const AdminLayout = () => {
     );
   }
 
-  // Strictly check for admin role
+  // kick out anyone who isnt an admin
   if (!user || user.role?.toLowerCase() !== "admin") {
     return <Navigate to="/home" replace />;
   }
 
   return (
     <div className="flex min-h-screen bg-[#050505]">
-      {/* 1. Fixed Sidebar */}
+      {/* sidebar stays fixed on the left */}
       <AdminSidebar />
 
-      {/* 2. Main Content Area */}
-      {/* Added 'lg:ml-72' to push content to the right of the fixed sidebar on desktop */}
+      {/* main area with margin to not overlap the sidebar */}
       <main className="flex-1 w-full lg:ml-72 transition-all duration-300">
-        {/* - pt-24 on mobile to clear the fixed top bar (h-16 + extra spacing)
-          - pt-10 on desktop for a clean top margin
-        */}
+        {/* padding shifts for mobile vs desktop and max width for big screens */}
         <div className="p-4 md:p-10 pt-24 lg:pt-10 max-w-[1600px] mx-auto min-h-screen">
+          {/* where admin sub-pages render */}
           <Outlet /> 
         </div>
       </main>

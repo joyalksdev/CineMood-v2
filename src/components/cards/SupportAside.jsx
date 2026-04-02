@@ -10,6 +10,7 @@ import {
 import { Link } from "react-router-dom";
 
 const SupportAside = () => {
+  // centralizing link data for easy maintenance and clean mapping
   const links = [
     {
       title: "Contact Developer",
@@ -35,8 +36,10 @@ const SupportAside = () => {
   ];
 
   return (
+    // sticky aside that stays in view while scrolling on desktop
     <aside className="w-full lg:w-80 sticky top-32 h-fit bg-white/[0.02] border border-white/5 rounded-[2rem] p-6 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-white/10 group/aside">
-      {/* Brand Header */}
+      
+      {/* support header with brand italic styling */}
       <div className="mb-8 px-2">
         <div className="flex items-center gap-2 text-[#FFC509] mb-2">
           <HelpCircle size={14} />
@@ -47,7 +50,7 @@ const SupportAside = () => {
         </h2>
       </div>
 
-      {/* Links Stack */}
+      {/* navigation stack with custom hover transitions and scaling */}
       <nav className="space-y-2">
         {links.map((link, idx) => (
           <Link
@@ -68,6 +71,7 @@ const SupportAside = () => {
                 </p>
               </div>
             </div>
+            {/* arrow icon that slides up-right on hover */}
             <ArrowUpRight 
               size={16} 
               className="text-neutral-700 group-hover:text-inherit transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" 
@@ -76,7 +80,7 @@ const SupportAside = () => {
         ))}
       </nav>
 
-      {/* Versioning & Status */}
+      {/* bottom version info with a glowing pulse indicator */}
       <div className="mt-8 pt-6 border-t border-white/5 px-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

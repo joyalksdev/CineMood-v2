@@ -38,7 +38,7 @@ const LoginNavbar = () => {
     const lang = e.target.value;
     
     const triggerTranslation = () => {
-      // Look for Google's internal dropdown
+      // for Google's internal dropdown
       const googleCombo = document.querySelector(".goog-te-combo");
       if (googleCombo) {
         googleCombo.value = lang;
@@ -69,7 +69,7 @@ const LoginNavbar = () => {
         {shouldShowGetStarted && (
           <button
             className="px-5 py-2 bg-[#FFC509] rounded-lg text-black font-bold text-sm hover:bg-amber-300 transition-all active:scale-95"
-            onClick={() => navigate(user ? "/home" : "/get-started")}
+            onClick={() => navigate(user ? "/home" : "/register")}
           >
             Get Started
           </button>

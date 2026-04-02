@@ -13,12 +13,14 @@ const RecommendationCard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const rowRef = useRef(null);
+
+  // memoize genres so the array reference only changes when actual data does
   const userGenres = useMemo(() => user?.genres || [], [user?.genres]);
   const userLang = user?.language;
 
   useEffect(() => {
     const loadRecommendations = async () => {
-      // Don't set loading to true if we already have movies (prevents "flash" on watchlist update)
+      // smart loading: only show skeleton if we have zero movies to avoid UI flickering
       if (movies.length === 0) setLoading(true); 
       
       if (!userGenres.length) {
@@ -38,11 +40,11 @@ const RecommendationCard = () => {
     };
 
     loadRecommendations();
-    // ONLY re-run if genres or language actually change, 
-    // NOT when the watchlist inside the user object changes.
+    // dependency array ensures we don't re-fetch just because the watchlist updates
   }, [userGenres, userLang]);
 
 
+  // scroll logic: moves the row by 80% of the container width
   const scroll = (direction) => {
     if (rowRef.current) {
       const scrollAmount = rowRef.current.clientWidth * 0.8;
@@ -59,7 +61,7 @@ const RecommendationCard = () => {
         <QuickViewModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
       )}
 
-      {/* Header Area */}
+      {/* header with custom branding and animated pulse text */}
       <div className="flex justify-between items-end mb-4 px-4 md:px-12">
         <div className="space-y-1">
           <h2 className="text-xl md:text-2xl font-extrabold text-white tracking-tight group-hover/section:text-[#FFC509] transition-colors duration-300 flex items-center gap-2">
@@ -73,6 +75,7 @@ const RecommendationCard = () => {
       </div>
 
       <div className="relative group/carousel px-4 md:px-10">
+        {/* navigation buttons with custom hover colors to match brand yellow */}
         <button onClick={() => scroll("left")} className="absolute left-1 top-[40%] -translate-y-1/2 z-50 w-12 h-12 items-center justify-center rounded-full bg-black/80 backdrop-blur-2xl border border-white/10 opacity-0 group-hover/carousel:opacity-100 transition-all hidden md:flex hover:scale-110 hover:border-[#FFC509]/50 hover:text-[#FFC509]">
           <ChevronLeft size={32} />
         </button>
@@ -87,9 +90,10 @@ const RecommendationCard = () => {
             movies.map((movie) => (
               <div
                 key={movie.id}
-                onClick={() => setSelectedMovie(movie)} // Tap to open on mobile
+                onClick={() => setSelectedMovie(movie)}
                 className="relative px-3 min-w-[145px] sm:min-w-[180px] md:min-w-[220px] lg:min-w-[260px] snap-start group/card py-2 cursor-pointer"
               >
+                {/* card container with poster image and brand color border hover */}
                 <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/5 transition-all duration-500 md:group-hover/card:border-[#FFC509]/40 shadow-2xl">
                   <img
                     src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : moviePlaceholder}
@@ -97,20 +101,20 @@ const RecommendationCard = () => {
                     alt={movie.title}
                   />
 
-                  {/* Rating Badge */}
+                  {/* rating badge with custom branding */}
                   <div className="absolute top-3 right-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[#FFC509] flex items-center gap-1 font-black text-[10px] z-10 transition-transform md:group-hover/card:scale-110">
                     <Star size={12} fill="#FFC509" />
                     {(movie.rating || movie.vote_average || 0).toFixed(1)}
                   </div>
 
-                  {/* MOBILE ONLY: Floating Watchlist */}
+                  {/* mobile-friendly watchlist button */}
                   <div className="absolute bottom-3 right-3 md:hidden z-20" onClick={(e) => e.stopPropagation()}>
                     <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-xl p-0.5">
                         <WatchlistButton movie={movie} variant="card" />
                     </div>
                   </div>
 
-                  {/* DESKTOP ONLY: Hover Overlay */}
+                  {/* desktop hover overlay with Info and Watchlist actions */}
                   <div className="hidden md:flex absolute inset-0 flex-col justify-end p-5 opacity-0 group-hover/card:opacity-100 transition-all duration-300 bg-gradient-to-t from-black via-black/40 to-transparent">
                     <h3 className="text-white font-bold text-sm mb-4 line-clamp-2 leading-tight transform translate-y-2 group-hover/card:translate-y-0 transition-transform duration-300">
                       {movie.title}
@@ -130,7 +134,7 @@ const RecommendationCard = () => {
                   </div>
                 </div>
 
-                {/* Sub-text below Card */}
+                {/* movie year and 'Personalized' tag below card */}
                 <div className="mt-4 px-2">
                   <h4 className="text-white text-[13px] font-bold truncate md:hidden mb-1">{movie.title}</h4>
                   <p className="text-white/40 text-[9px] font-bold uppercase tracking-[0.2em] group-hover/card:text-[#FFC509] transition-colors duration-300">

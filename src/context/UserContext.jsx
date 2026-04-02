@@ -1,63 +1,63 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/axios";
 
+// Create the context for other components to access user data
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+  // Initialize state: check localStorage first, then sessionStorage
   const [user, setUser] = useState(() => {
-    // UPDATED: Check both localStorage (permanent) and sessionStorage (temporary)
     const saved = localStorage.getItem("cinemood_user") || sessionStorage.getItem("cinemood_user");
     return saved ? JSON.parse(saved) : null;
   });
+  
   const [loading, setLoading] = useState(true);
 
- // UserContext.jsx
-useEffect(() => {
-  const syncUser = async () => {
-    try {
-      const response = await api.get("/profile/me");
-      
-      if (response.data.success) {
-        // Check if the user was originally in localStorage
-        const wasRemembered = localStorage.getItem("cinemood_user") !== null;
-        saveUser(response.data.user, wasRemembered);
+  // Sync session with the backend on every hard refresh
+  useEffect(() => {
+    const syncUser = async () => {
+      try {
+        const response = await api.get("/profile/me");
+        
+        if (response.data.success) {
+          // If they are in localStorage, they chose "Remember Me"
+          const wasRemembered = localStorage.getItem("cinemood_user") !== null;
+          saveUser(response.data.user, wasRemembered);
+        }
+      } catch (err) {
+        // If the token is expired/invalid, clear everything
+        localStorage.removeItem("cinemood_user");
+        sessionStorage.removeItem("cinemood_user");
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      localStorage.removeItem("cinemood_user");
-      sessionStorage.removeItem("cinemood_user");
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  syncUser();
-}, []);
+    syncUser();
+  }, []);
 
-  const handleClearUser = () => {
-    localStorage.removeItem("cinemood_user");
-    setUser(null);
-  };
-
-const saveUser = (data, remember = false) => {
+  // Update both the state and the browser storage
+  const saveUser = (data, remember = false) => {
     if (!data) return;
     setUser(data);
     
     if (remember) {
-      // Stays even after browser close
+      // Permanent storage (survives closing the browser)
       localStorage.setItem("cinemood_user", JSON.stringify(data));
     } else {
-      // Clears when tab is closed
+      // Temporary storage (clears when the tab is closed)
       sessionStorage.setItem("cinemood_user", JSON.stringify(data));
     }
   };
-const logout = async () => {
+
+  // Full logout: notifies backend, wipes storage, and redirects
+  const logout = async () => {
     try {
       await api.post("/auth/logout");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
-      // UPDATED: Clear both just to be absolutely safe
       localStorage.removeItem("cinemood_user");
       sessionStorage.removeItem("cinemood_user");
       setUser(null);
@@ -72,4 +72,5 @@ const logout = async () => {
   );
 };
 
+// Custom hook for easy access: const { user } = useUser();
 export const useUser = () => useContext(UserContext);

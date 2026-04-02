@@ -15,12 +15,13 @@ const AdminSidebar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const menuRef = useRef(null);
 
-  // Close sidebar/dropdown on route change or click outside
+  // auto-close sidebar and profile menus when the user navigates
   useEffect(() => {
     setIsOpen(false);
     setShowProfileMenu(false);
   }, [pathname]);
 
+  // handle clicks outside the profile menu to close it automatically
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -31,6 +32,7 @@ const AdminSidebar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // navigation mapping for easy maintenance
   const menuItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "User Management", path: "/admin/users", icon: Users },
@@ -39,11 +41,12 @@ const AdminSidebar = () => {
     { name: "Notifications", path: "/admin/broadcast", icon: BellRing },
   ];
 
+  // helper to check if a link is the current active route
   const isActive = (path) => pathname === path;
 
   return (
     <>
-      {/* --- MOBILE TOP BAR --- */}
+      {/* --- MOBILE TOP NAVIGATION --- */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-6 z-[70]">
         <div className="flex items-center gap-2">
           <img src={logo} alt="Logo" className="h-6" />
@@ -62,7 +65,7 @@ const AdminSidebar = () => {
         </button>
       </div>
 
-      {/* --- OVERLAY --- */}
+      {/* --- MOBILE OVERLAY (backdrop) --- */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] lg:hidden animate-in fade-in duration-300"
@@ -70,7 +73,7 @@ const AdminSidebar = () => {
         />
       )}
 
-      {/* --- FIXED SIDEBAR --- */}
+      {/* --- PRIMARY ADMIN SIDEBAR --- */}
       <aside data-lenis-prevent className={`
         fixed top-0 left-0 z-[65]
         w-72 h-screen bg-[#050505] border-r border-white/5 
@@ -78,23 +81,23 @@ const AdminSidebar = () => {
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         
-        {/* Branding Section */}
+        {/* sidebar branding (hidden on mobile header) */}
         <div className="hidden lg:flex mb-12 px-2 items-center gap-3">
           <img src={logo} alt="Logo" className="h-8 brightness-110 shadow-[0_0_20px_rgba(255,197,9,0.2)]" />
           <div>
-            <h2 className="text-white font-bold text-xl leading-tight tracking-tight">
+            <h2 className="text-white font-black text-xl leading-tight tracking-tighter italic uppercase">
               Cine<span className="text-[#FFC509]">Mood</span>
             </h2>
             <p className="text-[9px] uppercase tracking-[0.4em] text-neutral-600 font-black">Admin panel</p>
           </div>
         </div>
 
-        {/* Mobile Header */}
+        {/* section label for mobile view navigation */}
         <div className="lg:hidden mb-8 pt-4 flex items-center justify-between">
             <span className="text-[10px] font-black text-neutral-700 uppercase tracking-[0.2em]">System Navigation</span>
         </div>
 
-        {/* Navigation Links */}
+        {/* sidebar navigation link list */}
         <nav className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
           {menuItems.map((item) => (
             <Link
@@ -102,7 +105,7 @@ const AdminSidebar = () => {
               to={item.path}
               className={`group relative flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-500 ${
                 isActive(item.path)
-                  ? "bg-[#FFC509] text-black shadow-xl shadow-[#FFC509]/10 translate-x-1"
+                  ? "bg-[#FFC509] text-black shadow-xl shadow-[#FFC509]/20 translate-x-1"
                   : "text-neutral-500 hover:bg-white/[0.03] hover:text-white"
               }`}
             >
@@ -115,10 +118,10 @@ const AdminSidebar = () => {
           ))}
         </nav>
 
-        {/* Footer: Multi-option Logout Dropdown */}
+        {/* footer area with user profile & logout dropdown */}
         <div className="mt-auto pt-6 border-t border-white/5 relative" ref={menuRef}>
           
-          {/* Action Menu (Popup) */}
+          {/* animated action menu for profile settings and logout */}
           {showProfileMenu && (
             <div className="absolute bottom-24 left-0 w-full bg-[#0A0A0A] border border-white/10 rounded-2xl p-2 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 z-50 backdrop-blur-xl">
               <Link 
@@ -138,13 +141,14 @@ const AdminSidebar = () => {
             </div>
           )}
 
-          {/* User Profile Button */}
+          {/* user profile trigger button */}
           <button 
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className={`w-full group bg-white/[0.02] border border-white/5 p-4 rounded-3xl flex items-center justify-between transition-all duration-300 hover:border-white/10 ${showProfileMenu ? 'bg-white/[0.05] ring-1 ring-white/10' : ''}`}
           >
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-tr from-[#FFC509] to-orange-500 flex items-center justify-center font-bold text-black text-sm shadow-xl">
+              {/* dynamic avatar using first letter of admin name */}
+              <div className="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-tr from-[#FFC509] to-orange-500 flex items-center justify-center font-black text-black text-sm shadow-xl italic">
                  {user?.name?.charAt(0) || "A"}
               </div>
               <div className="text-left overflow-hidden">

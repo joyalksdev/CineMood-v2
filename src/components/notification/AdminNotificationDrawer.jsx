@@ -4,6 +4,7 @@ import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import DeleteModal from "../modals/DeleteModal";
 
 const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onUpdate, fetchNotifications }) => {
+  // prevents scrolling the background when drawer is open
   useLockBodyScroll(isOpen);
   const [editingId, setEditingId] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
@@ -13,24 +14,26 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
 
   if (!isOpen) return null;
 
+  // re-fetches notifications from the server
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await fetchNotifications();
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  
-
+  // populates the form with existing data to start editing
   const startEditing = (n) => {
     setEditingId(n._id);
     setEditForm({ title: n.title, message: n.message, type: n.type });
   };
 
+  // sends the updated data to the backend
   const handleSave = async (id) => {
     await onUpdate(id, editForm);
     setEditingId(null);
   };
 
+  // handles the final deletion after user confirms
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
@@ -41,6 +44,7 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
     }
   };
 
+  // determines icons and colors based on notification category
   const getCategoryStyles = (type) => {
     switch (type) {
       case "system":
@@ -58,11 +62,12 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
 
   return (
     <div className="fixed inset-0 z-[110] flex justify-end overflow-hidden">
+      {/* clickable backdrop to close */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       <div className="relative w-full max-w-md h-full bg-[#080808] border-l border-white/5 flex flex-col shadow-2xl animate-in slide-in-from-right duration-500">
         
-        {/* REFINED DELETE MODAL */}
+        {/* sub-modal for delete confirmation */}
         <DeleteModal 
           isOpen={!!deleteConfirmId}
           onConfirm={handleConfirmDelete}
@@ -72,7 +77,7 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
           message="This notification will be permanently removed from all user feeds."
         />
 
-        {/* Header */}
+        {/* drawer header */}
         <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/20">
           <div>
             <h3 className="text-sm font-bold uppercase tracking-widest text-white">Notifications</h3>
@@ -88,7 +93,7 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
           </div>
         </div>
 
-        {/* List Content */}
+        {/* scrollable list of notifications */}
         <div data-lenis-prevent className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar">
           {notifications.length > 0 ? (
             notifications.map((n) => {
@@ -102,6 +107,7 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
                     editingId === n._id ? 'border-[#FFC509]/40 bg-[#FFC509]/5' : styles.border
                   }`}
                 >
+                  {/* render edit form if this item is being edited */}
                   {editingId === n._id ? (
                     <div className="space-y-4 animate-in fade-in duration-300">
                       <div className="flex items-center justify-between">
@@ -141,6 +147,7 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
                       </div>
                     </div>
                   ) : (
+                    // standard notification view
                     <div className="flex gap-4">
                       <div className={`shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center border ${styles.border} ${styles.bg} ${styles.color}`}>
                         <CategoryIcon size={18} />
@@ -180,6 +187,7 @@ const AdminNotificationDrawer = ({ isOpen, onClose, notifications, onDelete, onU
               );
             })
           ) : (
+            // empty state when no notifications exist
             <div className="h-full flex flex-col items-center justify-center py-20">
               <BellOff size={40} className="mb-4 text-neutral-900" />
               <p className="text-[10px] font-bold text-neutral-700 uppercase tracking-widest">No notifications found</p>

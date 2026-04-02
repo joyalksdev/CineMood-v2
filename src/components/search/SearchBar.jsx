@@ -13,6 +13,7 @@ const SearchBar = ({ isOpen, onClose }) => {
 
   const boxRef = useRef(null)
 
+  // handles debounced api calls to prevent rate limiting
   useEffect(() => {
     if (!query.trim()) {
       setMovieResults([])
@@ -28,6 +29,7 @@ const SearchBar = ({ isOpen, onClose }) => {
     return () => clearTimeout(delay)
   }, [query])
 
+  // closes search results when clicking outside the box
   useEffect(() => {
     const handler = e => {
       if (boxRef.current && !boxRef.current.contains(e.target)) {
@@ -42,17 +44,17 @@ const SearchBar = ({ isOpen, onClose }) => {
     <div className={`
       fixed lg:static inset-0 z-50 flex items-start lg:items-center justify-center
       ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto"}
-      bg-black/80 lg:bg-transparent transition-all  duration-500 pt-24 lg:pt-0
+      bg-black/80 lg:bg-transparent transition-all duration-500 pt-24 lg:pt-0
     `}>
       
+      {/* mobile close button */}
       <button onClick={onClose} className="absolute top-8 right-8 text-neutral-400 hover:text-white lg:hidden">
         <X size={28} />
       </button>
 
-      {/* FIXED CONTAINER: Added 'bg-transparent' and removed any implicit padding or borders */}
       <div ref={boxRef} className="relative w-[90%] lg:w-full max-w-md bg-transparent">
         
-        {/* Input Field (Now with refined backdrop-blur-3xl and bg-white/[0.03]) */}
+        {/* search input with glassmorphism styling */}
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-[#FFC509] transition-colors" size={18} />
           
@@ -67,6 +69,7 @@ const SearchBar = ({ isOpen, onClose }) => {
             className="w-full pl-12 pr-12 py-3 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-3xl outline-none focus:border-[#FFC509]/40 focus:bg-white/[0.07] transition-all text-sm text-white placeholder:text-neutral-500 shadow-2xl"
           />
 
+          {/* clear query button */}
           {query && (
             <button onClick={() => setQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white">
               <X size={16} />
@@ -74,11 +77,11 @@ const SearchBar = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {/* Results Dropdown (Scrollable, High Visibility) */}
+        {/* results dropdown with separate sections for movies and people */}
         {showResults && query.length > 0 && (
           <div data-lenis-prevent className="absolute mt-3 w-full max-h-[70vh] overflow-y-auto bg-stone-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] z-50 custom-scrollbar animate-in fade-in slide-in-from-top-4 duration-300">
             
-            {/* Movies Section */}
+            {/* movie result items */}
             {movieResults.length > 0 && (
               <div className="p-2">
                 <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-[#FFC509]/60 uppercase tracking-[0.2em]">
@@ -102,7 +105,6 @@ const SearchBar = ({ isOpen, onClose }) => {
                         <span className="text-xs text-neutral-400 flex items-center gap-1">
                           <Calendar size={11} /> {movie.release_date?.slice(0,4)}
                         </span>
-                        {/* Fixed Visibility Rating */}
                         <span className="text-xs text-[#FFC509] font-bold flex items-center gap-1">
                           <Star size={11} fill="#FFC509" /> {movie.rating.toFixed(1)}
                         </span>
@@ -113,7 +115,7 @@ const SearchBar = ({ isOpen, onClose }) => {
               </div>
             )}
 
-            {/* People Section */}
+            {/* actor/crew result items */}
             {peopleResults.length > 0 && (
               <div className="p-2 border-t border-white/5">
                 <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-[#FFC509]/60 uppercase tracking-[0.2em]">

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { HelpCircle, X, Send, MessageSquare, Mail, User, Loader2 } from 'lucide-react';
-import api from "../../services/axios"; // Assuming your axios instance is here
+import api from "../../services/axios"; 
 import toast from "react-hot-toast";
 
 const SupportModal = () => {
@@ -9,12 +9,15 @@ const SupportModal = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("idle");
 
+  // handles the mounting/unmounting delay for smooth css transitions
   const toggleModal = (value) => {
     if (value) {
       setIsOpen(true);
+      // tiny delay to trigger entry animation after mount
       setTimeout(() => setIsAnimating(true), 10);
     } else {
       setIsAnimating(false);
+      // wait for exit animation to finish before unmounting
       setTimeout(() => setIsOpen(false), 500);
     }
   };
@@ -24,14 +27,14 @@ const SupportModal = () => {
     setStatus("sending");
 
     try {
-      // Real API call to your support controller
+      // hits the support/contact endpoint with user form data
       const { data } = await api.post('/support/contact', formData);
 
       if (data.success) {
         setStatus("success");
         toast.success("Transmission Received 🚀");
         
-        // Auto-close after success
+        // auto-cleanup: close modal and reset form after 2 seconds
         setTimeout(() => {
           toggleModal(false);
           setStatus("idle");
@@ -48,12 +51,13 @@ const SupportModal = () => {
 
   return (
     <>
-      {/* Floating Trigger Button */}
+      {/* floating button that follows user scroll */}
       <div className="fixed bottom-6 right-6 flex flex-col items-end z-[9999]">
         <button 
           onClick={() => toggleModal(true)}
           className="group relative flex items-center bg-neutral-900 border border-white/10 px-4 py-3 rounded-full hover:bg-[#FFC509] transition-all duration-500 hover:text-black shadow-2xl"
         >
+          {/* label only appears on hover */}
           <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap opacity-0 group-hover:opacity-100 group-hover:mr-3">
             Help & Support
           </span>
@@ -61,10 +65,11 @@ const SupportModal = () => {
         </button>
       </div>
 
-      {/* Backdrop & Modal Container */}
+      {/* modal portal logic */}
       {isOpen && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-6">
           
+          {/* dark blurred backdrop - clicking here closes modal */}
           <div 
             className={`absolute inset-0 bg-black/80 transition-all duration-500 ease-out ${
               isAnimating ? "opacity-100 backdrop-blur-xl" : "opacity-0 backdrop-blur-0"
@@ -72,6 +77,7 @@ const SupportModal = () => {
             onClick={() => toggleModal(false)}
           />
 
+          {/* actual support card */}
           <div className={`relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-all duration-500 ease-out ${
             isAnimating 
               ? "opacity-100 scale-100 translate-y-0" 
@@ -96,6 +102,7 @@ const SupportModal = () => {
               </button>
             </div>
 
+            {/* contact form fields */}
             <form onSubmit={handleSubmit} className="p-8 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
@@ -146,6 +153,7 @@ const SupportModal = () => {
               Expect a digital tap on the shoulder via email soon.
             </p>
 
+            {/* decorative bottom gradient */}
             <div className="h-1 bg-gradient-to-r from-transparent via-[#FFC509]/40 to-transparent w-full opacity-30" />
           </div>
         </div>

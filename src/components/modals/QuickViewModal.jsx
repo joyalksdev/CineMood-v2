@@ -12,47 +12,31 @@ const QuickViewModal = ({ movie, onClose }) => {
   const navigate = useNavigate();
   const [openReview, setOpenReview] = useState(false);
 
-  // --- DATA FIXES ---
+  // cleanup paths and handle ratings/popularity safely
   const backdrop = movie?.backdrop_path?.trim();
-
-  // Use optional chaining and a fallback to 0 before calling toFixed
   const rawRating = movie?.rating ?? movie?.vote_average ?? 0;
   const displayRating = Number(rawRating).toFixed(1);
 
-  // Ensure popularity is a number
-  const isTrending =
-    Number(movie?.popularity) > 500 || movie?.media_type === "movie";
+  // logic for badge display
+  const isTrending = Number(movie?.popularity) > 500 || movie?.media_type === "movie";
 
-  // 3. Genre Map
   const genreMap = {
-    28: "Action",
-    12: "Adventure",
-    16: "Animation",
-    35: "Comedy",
-    80: "Crime",
-    99: "Doc",
-    18: "Drama",
-    10751: "Family",
-    14: "Fantasy",
-    36: "History",
-    27: "Horror",
-    10402: "Music",
-    9648: "Mystery",
-    10749: "Romance",
-    878: "Sci-Fi",
-    10770: "TV",
-    53: "Thriller",
-    10752: "War",
-    37: "Western",
+    28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
+    99: "Doc", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
+    27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Sci-Fi",
+    10770: "TV", 53: "Thriller", 10752: "War", 37: "Western",
   };
 
-  // 4. FIX: If genre_ids is missing in the object, show a default or check 'genres' array
+  // pull first 3 genres from either id map or direct genre objects
   const genresToDisplay = movie.genre_ids
     ? movie.genre_ids.slice(0, 3).map((id) => genreMap[id])
     : movie.genres
       ? movie.genres.slice(0, 3).map((g) => g.name)
-      : ["Movie"]; // Fallback if both are missing
+      : ["Movie"];
 
+      console.log(movie)
+
+  // close modal when clicking outside the box
   useEffect(() => {
     const handler = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -66,12 +50,14 @@ const QuickViewModal = ({ movie, onClose }) => {
   return (
     <AnimatePresence>
       {movie && (
+        // main overlay with fade animation
         <motion.div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          {/* modal container with scale and slide animation */}
           <motion.div
             ref={modalRef}
             initial={{ scale: 0.9, opacity: 0, y: 40 }}
@@ -79,6 +65,7 @@ const QuickViewModal = ({ movie, onClose }) => {
             exit={{ scale: 0.9, opacity: 0, y: 40 }}
             className="bg-[#0b0b0b] text-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 relative"
           >
+            {/* close icon button */}
             <button
               onClick={onClose}
               className="absolute right-6 top-6 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-yellow-400 hover:text-black transition z-20 border border-white/10"
@@ -86,32 +73,29 @@ const QuickViewModal = ({ movie, onClose }) => {
               ✕
             </button>
 
+            {/* hero image and title section */}
             <div className="relative h-[280px] md:h-[320px]">
               <img
-                src={
-                  backdrop
-                    ? `https://image.tmdb.org/t/p/original${backdrop}`
-                    : mHPlaceholder
-                }
+                src={backdrop ? `https://image.tmdb.org/t/p/original${backdrop}` : mHPlaceholder}
                 className="w-full h-full object-cover"
                 alt={movie.title}
               />
+              {/* gradient overlay for text readability */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0b] via-[#0b0b0b]/40 to-transparent" />
 
               <div className="absolute bottom-0 left-10 right-10">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {/* rating badge */}
                   <span className="text-xs text-[#FFC509] font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-lg">
                     <Star fill="#FFC509" size={13} /> {displayRating}
                   </span>
 
-                  {/* Trending Badge*/}
                   {isTrending && (
                     <span className="bg-[#FFC509] text-black text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-tighter shadow-xl">
                       Trending
                     </span>
                   )}
 
-                  {/* Recommended Badge (Using corrected displayRating) */}
                   {displayRating >= 7 && (
                     <span className="bg-green-500 text-black text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-tighter shadow-xl flex items-center gap-1">
                       <TbStar className="fill-black" /> Recommended
@@ -129,8 +113,9 @@ const QuickViewModal = ({ movie, onClose }) => {
               </div>
             </div>
 
+            {/* details and action section */}
             <div className="px-10 py-8 bg-[#0b0b0b]">
-              {/* Genres Row (Using corrected genresToDisplay) */}
+              {/* horizontal genre chips */}
               <div className="flex flex-wrap gap-2 mb-5">
                 {genresToDisplay.map((name, index) => (
                   <span
@@ -142,10 +127,12 @@ const QuickViewModal = ({ movie, onClose }) => {
                 ))}
               </div>
 
+              {/* short movie synopsis */}
               <p className="text-sm leading-relaxed text-neutral-400 line-clamp-3 font-medium opacity-90">
                 {movie.overview}
               </p>
 
+              {/* primary actions: details, watchlist, and review */}
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <button
                   onClick={() => navigate(`/movie/${movie.id}`)}
@@ -166,6 +153,7 @@ const QuickViewModal = ({ movie, onClose }) => {
                 </button>
               </div>
 
+              {/* nested review modal portal */}
               {openReview && (
                 <ReviewModal
                   movie={movie}

@@ -4,8 +4,10 @@ import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NotificationDrawer = ({ isOpen, onClose, notifications, onMarkRead, onMarkAllRead, onRefresh, loading }) => {
+  // locks body scroll when drawer is open
   useLockBodyScroll(isOpen);
 
+  // returns specific icons based on notification category
   const getIcon = (type) => {
     switch (type) {
       case 'maintenance': return <Construction className="text-orange-400/80" size={18} />;
@@ -17,30 +19,23 @@ const NotificationDrawer = ({ isOpen, onClose, notifications, onMarkRead, onMark
     }
   };
 
-const formatNotificationDate = (dateString) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  // Normalize both to midnight to count calendar days accurately
-  const diffInMs = new Date(now).setHours(0,0,0,0) - new Date(date).setHours(0,0,0,0);
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-  // 1. TODAY: Show the specific time (e.g., 4:30 PM)
-  if (diffInDays === 0) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  // 2. YESTERDAY: Show the string
-  if (diffInDays === 1) {
-    return "Yesterday";
-  }
-  // 3. OLDER: Show the month and day (e.g., Mar 28)
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-};
-
+  // converts timestamps into readable relative strings
+  const formatNotificationDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = new Date(now).setHours(0,0,0,0) - new Date(date).setHours(0,0,0,0);
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (diffInDays === 1) return "Yesterday";
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex justify-end overflow-hidden">
-          {/* Backdrop with soft blur */}
+          {/* background overlay with fade and blur */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -49,7 +44,7 @@ const formatNotificationDate = (dateString) => {
             onClick={onClose}
           />
 
-          {/* Drawer Content */}
+          {/* sliding drawer container */}
           <motion.div 
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -58,7 +53,7 @@ const formatNotificationDate = (dateString) => {
             className="relative w-full max-w-md h-full bg-[#0a0a0a] border-l border-white/5 flex flex-col shadow-2xl"
           >
             
-            {/* Header: Clean & Modern */}
+            {/* drawer header area */}
             <div className="p-6 flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-white tracking-tight">Notifications</h3>
@@ -77,7 +72,7 @@ const formatNotificationDate = (dateString) => {
               </div>
             </div>
 
-            {/* Notification List */}
+            {/* main scrollable notification feed */}
             <div data-lenis-prevent className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
               {notifications.length > 0 ? (
                 notifications.map((n, i) => (
@@ -92,7 +87,7 @@ const formatNotificationDate = (dateString) => {
                       : 'bg-white/[0.03] border-white/10 hover:border-[#FFC509]/30 hover:bg-white/[0.05]'
                     }`}
                   >
-                    {/* New Notification Dot with Ping Animation */}
+                    {/* pulse dot for unread status */}
                     {!n.isRead && (
                       <div className="absolute top-5 right-5 flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFC509] opacity-75"></span>
@@ -132,6 +127,7 @@ const formatNotificationDate = (dateString) => {
                   </motion.div>
                 ))
               ) : (
+                // empty state display
                 <div className="h-full flex flex-col items-center justify-center text-neutral-600 py-20">
                   <div className="p-4 bg-white/5 rounded-full mb-4">
                     <BellOff size={28} className="opacity-20" />
@@ -141,7 +137,7 @@ const formatNotificationDate = (dateString) => {
               )}
             </div>
 
-            {/* Footer */}
+            {/* persistent footer with batch actions */}
             <div className="p-6 border-t border-white/5 bg-black/40 backdrop-blur-md">
               <button 
                 onClick={onMarkAllRead}

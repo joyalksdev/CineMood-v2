@@ -13,6 +13,7 @@ import {
 import { motion } from 'framer-motion';
 
 const AboutSection = () => {
+  // core feature list with specific branding for AI and database tech
   const features = [
     {
       icon: <Sparkles className="text-[#FFC509]" size={24} />,
@@ -51,12 +52,13 @@ const AboutSection = () => {
             <span className="text-[#FFC509]">Redefined.</span>
           </h2>
           <p className="text-white/50 max-w-2xl text-lg font-medium leading-relaxed">
-            CineMood isn't just a movie tracker. It's a personalized AI ecosystem designed 
-            to end the "infinite scroll" and help you find your next favorite story.
+           While other apps just list titles, we treat your mood as a data point. 
+           By mapping your current vibe against the global film index, we bridge 
+           the gap between your headspace and the screen.
           </p>
         </div>
 
-        {/* --- Feature Grid --- */}
+        {/* --- Feature Grid with scroll animations --- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           {features.map((f, i) => (
             <motion.div 
@@ -75,7 +77,7 @@ const AboutSection = () => {
           ))}
         </div>
 
-        {/* --- Visual Breakdown / Screenshot Section --- */}
+        {/* --- Deep Dive: Weekly Spotlight & Technical Breakdown --- */}
         <div className="relative rounded-[3rem] bg-gradient-to-br from-neutral-900 to-black border border-white/5 p-8 md:p-16 overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
@@ -93,6 +95,7 @@ const AboutSection = () => {
                     </p>
                 </div>
 
+                {/* mini-feature list for technical capabilities */}
                 <ul className="grid grid-cols-1 gap-4">
                     {[
                     { 
@@ -128,7 +131,7 @@ const AboutSection = () => {
                 </ul>
                 </div>
 
-            {/* Mockup Placeholder - Replace with your actual NexCart/CineMood screenshot */}
+            {/* mockup display area with hover effects */}
             <div className="relative order-1 lg:order-2">
               <div className="aspect-video bg-neutral-800 rounded-2xl overflow-hidden border border-white/10 shadow-2xl group cursor-crosshair">
                 <img 
@@ -136,20 +139,15 @@ const AboutSection = () => {
                   alt="CineMood Interface" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80"
                 />
-                <div className="absolute inset-0 flex items-center justify-center hidden">
-                  <div className="bg-[#FFC509] text-black p-4 rounded-full shadow-xl">
-                    <Clapperboard size={32} />
-                  </div>
-                </div>
               </div>
-              {/* Decorative Blur */}
+              {/* decorative glow effect */}
               <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-[#FFC509]/10 rounded-full blur-3xl -z-10" />
             </div>
 
           </div>
         </div>
 
-        {/* --- Footer Call to Action --- */}
+        {/* --- Back to Top Action --- */}
         <div className="mt-20 text-center">
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -157,7 +155,7 @@ const AboutSection = () => {
           >
             <span className="relative z-10">Back to Top</span>
             <div className="absolute right-0 top-0 bottom-0 flex items-center px-4 bg-[#FFC509] translate-x-full group-hover:translate-x-0 transition-transform">
-               <Zap size={16} />
+                <Zap size={16} />
             </div>
           </button>
         </div>

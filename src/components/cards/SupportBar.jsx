@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 const SupportBar = () => {
+  // centralized support link data for easy updates to URLs or labels
   const links = [
     {
       title: "Contact Developer",
@@ -32,10 +33,11 @@ const SupportBar = () => {
   ];
 
   return (
+    // horizontal bar container with glassmorphism and subtle border styling
     <div className="w-full bg-white/[0.02] border border-white/5 rounded-[2rem] p-4 backdrop-blur-xl shadow-2xl overflow-hidden">
       <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
         
-        {/* Leading Brand Section */}
+        {/* brand section with a vertical separator that hidden on mobile */}
         <div className="flex items-center gap-4 px-4 border-b lg:border-b-0 lg:border-r border-white/5 pb-4 lg:pb-0 lg:pr-8">
           <div className="w-2 h-2 rounded-full bg-[#FFC509] animate-pulse shadow-[0_0_8px_#FFC509]" />
           <div>
@@ -48,7 +50,7 @@ const SupportBar = () => {
           </div>
         </div>
 
-        {/* Horizontal Links */}
+        {/* responsive link grid: 1 column on mobile, 3 columns on small screens and up */}
         <nav className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
           {links.map((link, idx) => (
             <a
@@ -57,6 +59,7 @@ const SupportBar = () => {
               className={`group flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/10 active:scale-[0.97] ${link.color}`}
             >
               <div className="flex items-center gap-3">
+                {/* dynamic icon container that inherits text color for hover effects */}
                 <div className="p-2 bg-black/40 rounded-lg text-inherit border border-white/5 group-hover:border-inherit/20 transition-all">
                   {link.icon}
                 </div>
@@ -69,6 +72,7 @@ const SupportBar = () => {
                   </p>
                 </div>
               </div>
+              {/* animated arrow indicator */}
               <ArrowUpRight 
                 size={14} 
                 className="text-neutral-700 group-hover:text-inherit transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" 

@@ -6,7 +6,7 @@ import GoBackBtn from "../components/ui/GoBackBtn";
 import ReviewModal from "../components/modals/ReviewModal";
 import FullReviewModal from "../components/modals/FullReviewModal";
 import ReportModal from "../components/modals/ReportModal"; 
-import { useReviews } from "../services/useReviews";
+import { useReviews } from "../hooks/useReviews";
 import { IoStar, IoCreateOutline } from "react-icons/io5";
 import { RiDoubleQuotesL } from "react-icons/ri";
 import { Flag } from "lucide-react"; 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "./axios"; 
+import api from "../services/axios"; 
 
 export const useReviews = (movieId) => {
   const [reviews, setReviews] = useState([]);

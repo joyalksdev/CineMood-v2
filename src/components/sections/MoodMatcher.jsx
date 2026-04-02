@@ -3,30 +3,31 @@ import { FaSmile, FaSadTear, FaFire, FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, LayoutGrid } from "lucide-react";
 
+// define mood categories with specific TMDB genre IDs and UI styles
 const moods = [
   {
     label: "Happy",
     icon: <FaSmile size={20} />,
     activeClass: "border-yellow-500 bg-yellow-500/10 text-yellow-400 shadow-[0_0_20px_rgba(255,197,9,0.15)]",
-    genres: [35, 16],
+    genres: [35, 16], // Comedy, Animation
   },
   {
     label: "Romantic",
     icon: <FaHeart size={20} />,
     activeClass: "border-rose-500 bg-rose-500/10 text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.15)]",
-    genres: [10749, 18],
+    genres: [10749, 18], // Romance, Drama
   },
   {
     label: "Thrilling",
     icon: <FaFire size={20} />,
-    activeClass: "border-red-500 bg-red-500/10 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.15)]",
-    genres: [28, 53],
+    activeClass: "border-red-500 bg-red-500/10 text-red-400 shadow-[0_0_20_rgba(239,68,68,0.15)]",
+    genres: [28, 53], // Action, Thriller
   },
   {
     label: "Sad",
     icon: <FaSadTear size={20} />,
-    activeClass: "border-blue-500 bg-blue-500/10 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.15)]",
-    genres: [18],
+    activeClass: "border-blue-500 bg-blue-500/10 text-blue-400 shadow-[0_0_20_rgba(59,130,246,0.15)]",
+    genres: [18], // Drama
   },
 ];
 
@@ -35,6 +36,7 @@ const MoodMatcher = () => {
   const [typedMood, setTypedMood] = useState("");
   const navigate = useNavigate();
 
+  // handles navigation based on whether a preset mood or custom text is provided
   const handleSearch = () => {
     if (activeMood) {
       navigate(`/mood/${activeMood.label.toLowerCase()}`, {
@@ -50,20 +52,20 @@ const MoodMatcher = () => {
   return (
     <section className="relative w-full py-12 md:py-16 flex flex-col items-center justify-center rounded-[2.5rem] text-center bg-[#070707] border border-white/5 overflow-hidden px-6">
       
-      {/* Subtle Branding Glow */}
+      {/* visual atmospheric glow */}
       <div className="pointer-events-none absolute w-[400px] h-[400px] bg-[#FFC509]/5 blur-[120px] rounded-full -top-40 -left-20" />
 
-      {/* Tagline: Clear and Functional */}
+      {/* header badge */}
       <div className="relative z-10 flex items-center gap-2 px-3 py-1 mb-6 rounded-md bg-white/[0.03] border border-white/5">
         <LayoutGrid size={12} className="text-[#FFC509]" />
         <span className="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-500">Instant Filter</span>
       </div>
 
-      <h2 className="relative z-10 text-2xl md:text-4xl font-black text-white tracking-wide px-4  leading-none">
+      <h2 className="relative z-10 text-2xl md:text-4xl font-black text-white tracking-wide px-4 leading-none">
         Pick Your <span className="text-[#FFC509]">Mood</span>
       </h2>
 
-      {/* Mood Grid: Tactile & Interactive */}
+      {/* grid of interactive mood buttons */}
       <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 w-full max-w-xl">
         {moods.map((mood, i) => {
           const isSelected = activeMood?.label === mood.label;
@@ -91,7 +93,7 @@ const MoodMatcher = () => {
         })}
       </div>
 
-      {/* Input: Simple and Clean */}
+      {/* custom text input for semantic mood search */}
       <div className="relative z-10 mt-8 w-full max-w-sm">
         <input
           value={typedMood}
@@ -104,11 +106,12 @@ const MoodMatcher = () => {
         />
       </div>
 
+      {/* final action button */}
       <button
         onClick={handleSearch}
         disabled={!activeMood && !typedMood.trim()}
         className="relative z-10 mt-8 px-10 py-4 bg-white text-black font-black text-[10px] uppercase tracking-[0.2em]
-        rounded-xl hover:bg-[#FFC509] transition-all duration-300 disabled:opacity-20 group flex items-center gap-3 shadow-2xl"
+        rounded-xl hover:bg-[#FFC509] transition-all duration-300 disabled:opacity-20 group flex items-center gap-3 shadow-2xl cursor-pointer"
       >
         Find Movies
         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />

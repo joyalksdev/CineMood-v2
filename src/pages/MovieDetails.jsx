@@ -16,7 +16,7 @@ import { RiDoubleQuotesL } from "react-icons/ri";
 import userPlaceholder from "../assets/user-placeholder.png";
 import moviePlaceholder from "../assets/m-placeholder.png";
 import MovieCard from "../components/cards/MovieCard";
-import { useReviews } from "../services/useReviews";
+import { useReviews } from "../hooks/useReviews";
 import ReviewModal from "../components/modals/ReviewModal";
 import GoBackBtn from "../components/ui/GoBackBtn";
 import { Flag } from "lucide-react";

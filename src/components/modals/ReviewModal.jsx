@@ -5,11 +5,12 @@ import { addReview } from "../../services/reviewService";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ReviewModal = ({ movie, onClose }) => {
-  const [rating, setRating] = useState(5); // Default to middle
+  const [rating, setRating] = useState(5); // start at middle ground
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
   const submitReview = async () => {
+    // simple validation to ensure quality reviews
     if (text.trim().length < 5) return toast.error("Tell us a bit more about the vibe!");
     
     try {
@@ -31,20 +32,21 @@ const ReviewModal = ({ movie, onClose }) => {
   };
   
   return (
+    // main overlay with high z-index to sit on top of quickview
     <motion.div 
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
       exit={{ opacity: 0 }}
-      // INCREASED Z-INDEX TO 150 TO OVERLAY QUICKVIEW
       className="fixed inset-0 bg-black/90 backdrop-blur-md flex justify-center items-center z-[150] p-4"
     >
+      {/* modal container with slide-up animation */}
       <motion.div 
         initial={{ scale: 0.9, y: 20 }} 
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         className="bg-[#0f0f0f] w-full max-w-lg rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
       >
-        {/* Header with Backdrop */}
+        {/* top header using the movie backdrop for style */}
         <div className="relative h-32 w-full overflow-hidden">
           <img 
             src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`} 
@@ -61,7 +63,7 @@ const ReviewModal = ({ movie, onClose }) => {
         </div>
 
         <div className="p-8">
-          {/* Vibe Slider Section */}
+          {/* 1-10 rating slider section */}
           <div className="flex flex-col items-center mb-10">
             <div className="relative flex items-center justify-center mb-6">
               <span className="text-6xl font-black text-[#FFC509] drop-shadow-[0_0_15px_rgba(255,197,9,0.4)]">
@@ -70,6 +72,7 @@ const ReviewModal = ({ movie, onClose }) => {
               <span className="text-xl font-bold text-neutral-600 ml-2 mt-4">/ 10</span>
             </div>
 
+            {/* custom styled range input */}
             <div className="w-full px-4 relative">
               <input
                 type="range"
@@ -93,7 +96,7 @@ const ReviewModal = ({ movie, onClose }) => {
             </div>
           </div>
 
-          {/* Review Input */}
+          {/* text area for written review */}
           <div className="relative group">
             <textarea
               value={text}
@@ -103,7 +106,7 @@ const ReviewModal = ({ movie, onClose }) => {
             />
           </div>
 
-          {/* Footer Actions */}
+          {/* modal actions: close or publish */}
           <div className="flex items-center justify-between mt-8">
             <button onClick={onClose} className="text-sm font-semibold text-neutral-500 hover:text-white transition-colors">
               Maybe later

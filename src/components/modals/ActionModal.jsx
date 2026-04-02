@@ -11,9 +11,10 @@ const ActionModal = ({
   confirmText,
   variant = 'danger' 
 }) => {
+  // don't show anything if closed
   if (!isOpen) return null;
 
-  // Configuration based on variant
+  // switch styles based on danger or warning variant
   const config = {
     danger: {
       icon: <UserRoundX size={28} />,
@@ -28,12 +29,15 @@ const ActionModal = ({
   }[variant];
 
   return (
+    // full screen dark overlay with blur
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
+      {/* clicking the backdrop closes the modal unless loading */}
       <div className="absolute inset-0" onClick={loading ? null : onCancel} />
 
+      {/* modal box with dark theme and rounded corners */}
       <div className="relative bg-[#0A0A0A] border border-white/10 p-8 rounded-[2.5rem] text-center w-full max-w-[320px] shadow-[0_0_50px_rgba(0,0,0,0.5)]">
         
-        {/* Dynamic Icon */}
+        {/* icon box with a slight tilt for style */}
         <div className={`w-16 h-16 ${config.iconBg} rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3`}>
           {config.icon}
         </div>
@@ -45,7 +49,9 @@ const ActionModal = ({
           {message}
         </p>
 
+        {/* action buttons stack */}
         <div className="flex flex-col gap-3">
+          {/* confirm button - shows spinner when loading */}
           <button 
             disabled={loading}
             onClick={onConfirm} 
@@ -54,6 +60,7 @@ const ActionModal = ({
             {loading ? <Loader2 size={16} className="animate-spin" /> : confirmText}
           </button>
           
+          {/* cancel button */}
           <button 
             disabled={loading}
             onClick={onCancel} 

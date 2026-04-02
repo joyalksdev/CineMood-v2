@@ -4,16 +4,20 @@ import { useUser } from "../context/UserContext";
 const AdminRoute = () => {
   const { user, loading } = useUser();
 
+  // wait for UserContext to finish syncing before deciding access
   if (loading) return null;
 
-  // Check the role carefully - use lowercase to be safe
+  // normalize role to lowercase for safe comparison
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
+  // if user is missing or doesn't have the admin flag, bounce them to /home
   if (!user || !isAdmin) {
-    console.log("🚫 ADMIN ACCESS DENIED: ", user);
+    console.log("🚫 admin access denied: ", user);
+    // replace ensures they can't click "back" to get into the admin panel
     return <Navigate to="/home" replace />;
   }
 
+  // if everything checks out, render the protected admin children (Outlet)
   return <Outlet />;
 };
 
