@@ -27,9 +27,26 @@ const WeeklySpotlight = () => {
   const progress = Math.min(((watchlist?.length || 0) / 5) * 100, 100);
 
   useEffect(() => {
-    fetchSpotlight();
-  }, []);
+    // 1. Only run if we aren't loading anymore
+    // 2. Check if the "scrollToSpotlight" flag exists in location.state
+    // 3. Ensure the ref is actually attached to the DOM
+    if (!isLoading && location.state?.scrollToSpotlight && sectionRef.current) {
+      
+      // We use a tiny timeout to ensure the browser has finished painting the new layout
+      const timer = setTimeout(() => {
+        sectionRef.current.scrollIntoView({ 
+          behavior: "smooth", 
+          block: "center" 
+        });
 
+        // Clear the state so it doesn't scroll again if the user refreshes
+        navigate(location.pathname, { replace: true, state: {} });
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, location.state, navigate]);
+  
   const fetchSpotlight = async () => {
     setIsLoading(true);
     try {
@@ -41,6 +58,10 @@ const WeeklySpotlight = () => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    fetchSpotlight();
+  }, []);
+
 
   const scroll = (direction) => {
     if (scrollRef.current) {

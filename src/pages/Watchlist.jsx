@@ -185,7 +185,6 @@ const Watchlist = () => {
         onConfirm={() => {
           if (movieToDelete) {
             removeFromWatchlist(movieToDelete.id);
-            toast.success("Removed from watchlist");
           }
           setOpenDeleteModal(false);
           setMovieToDelete(null);

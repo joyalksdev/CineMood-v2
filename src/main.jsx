@@ -8,7 +8,7 @@ import { WatchlistProvider } from "./context/WatchlistContext";
 import { HelmetProvider } from "react-helmet-async";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <BrowserRouter>
       {/*
           - UserProvider: Manages the global login state (JWT check, profile).
@@ -23,5 +23,4 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </WatchlistProvider>
       </UserProvider>
     </BrowserRouter>
-  </React.StrictMode>,
 );

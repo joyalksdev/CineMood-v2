@@ -42,22 +42,22 @@ export const WatchlistProvider = ({ children }) => {
   };
 
   // remove movie by ID and sync the remaining list
-  const removeFromWatchlist = async (movieId) => {
-    try {
-      const response = await api.delete(`/watchlist/${movieId}`);
-      const updatedWatchlist = response.data;
-      
-      setWatchlist(updatedWatchlist);
-      
-      // update UserContext so the change persists across refreshes
-      saveUser({ ...user, watchlist: updatedWatchlist }, !!localStorage.getItem("cinemood_user"));
-      
-      toast.success("removed from watchlist");
-    } catch (err) {
-      console.error("remove error:", err);
-      toast.error("failed to remove");
-    }
-  };
+    const removeFromWatchlist = async (movieId) => {
+      try {
+        const response = await api.delete(`/watchlist/${movieId}`);
+        const updatedWatchlist = response.data;
+        
+        setWatchlist(updatedWatchlist);
+        
+        // update UserContext so the change persists across refreshes
+        saveUser({ ...user, watchlist: updatedWatchlist }, !!localStorage.getItem("cinemood_user"));
+        
+        toast.success("Removed from watchlist");
+      } catch (err) {
+        console.error("remove error:", err);
+        toast.error("failed to remove");
+      }
+    };
 
   return (
     <WatchlistContext.Provider value={{ watchlist, addToWatchlist, removeFromWatchlist }}>
