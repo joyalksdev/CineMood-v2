@@ -32,7 +32,7 @@ export const WatchlistProvider = ({ children }) => {
       // update UserContext to keep LocalStorage and Header counts in sync
       saveUser({ ...user, watchlist: updatedWatchlist }, !!localStorage.getItem("cinemood_user"));
       
-      toast.success(`${movie.title.toLowerCase()} added!`, {
+      toast.success(`${movie.title} added!`, {
         style: { background: '#171717', color: '#fff', fontSize: '12px', fontWeight: 'bold' }
       });
     } catch (err) {
