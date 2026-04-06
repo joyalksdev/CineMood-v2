@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { searchMovies, searchPeople } from "../../services/tmbdApi"
-import { Search, X, Film, User, Calendar, Star } from "lucide-react"
+import { Search, X, Film, User, Calendar, Star, SearchX } from "lucide-react"
 import { Link } from "react-router-dom"
 import userPlaceholder from "../../assets/user-placeholder.png"
 import moviePlaceholder from "../../assets/m-placeholder.png"
@@ -81,6 +81,20 @@ const SearchBar = ({ isOpen, onClose }) => {
         {showResults && query.length > 0 && (
           <div data-lenis-prevent className="absolute mt-3 w-full max-h-[70vh] overflow-y-auto bg-stone-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] z-50 custom-scrollbar animate-in fade-in slide-in-from-top-4 duration-300">
             
+            {/* empty state if no results found */}
+            {movieResults.length === 0 && peopleResults.length === 0 && (
+              <div className="p-10 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-300">
+                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
+                  <SearchX className="text-neutral-500" size={24} />
+                </div>
+                <p className="text-white font-bold text-sm">No results for "{query}"</p>
+                <p className="text-neutral-500 text-xs mt-1 max-w-[200px]">
+                  Check the spelling or try searching for something else.
+                </p>
+              </div>
+            )}
+
+
             {/* movie result items */}
             {movieResults.length > 0 && (
               <div className="p-2">

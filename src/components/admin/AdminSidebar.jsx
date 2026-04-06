@@ -51,8 +51,8 @@ const AdminSidebar = () => {
         <div className="flex items-center gap-2">
           <img src={logo} alt="Logo" className="h-6" />
           <div>
-            <h2 className="text-white font-bold text-lg leading-tight tracking-tight">
-              Cine<span className="text-[#FFC509]">Mood</span>
+            <h2 className="text-white font-normal text-xl leading-tight  ">
+              <span className="text-[#FFC509] font-bold">Cine</span>Mood
             </h2>
             <p className="text-[8px] uppercase tracking-[0.4em] text-neutral-600 font-black">Admin panel</p>
           </div>
@@ -85,8 +85,8 @@ const AdminSidebar = () => {
         <div className="hidden lg:flex mb-12 px-2 items-center gap-3">
           <img src={logo} alt="Logo" className="h-8 brightness-110 shadow-[0_0_20px_rgba(255,197,9,0.2)]" />
           <div>
-            <h2 className="text-white font-black text-xl leading-tight tracking-tighter italic uppercase">
-              Cine<span className="text-[#FFC509]">Mood</span>
+            <h2 className="text-white font-normal text-xl leading-tight  ">
+              <span className="text-[#FFC509] font-bold">Cine</span>Mood
             </h2>
             <p className="text-[9px] uppercase tracking-[0.4em] text-neutral-600 font-black">Admin panel</p>
           </div>
