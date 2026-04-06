@@ -158,7 +158,14 @@ const AdminDashboard = () => {
           
           {/* Traffic Flow Chart */}
           <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/5 rounded-3xl p-8 shadow-sm">
-            <h2 className="text-sm font-bold mb-6 opacity-50 uppercase tracking-widest">Traffic Flow (7D)</h2>
+           <div className="flex items-center gap-2 mb-6">
+              {/* NEW NAME HERE */}
+              <h2 className="text-sm font-bold opacity-50 uppercase tracking-widest">Neural & Search Activity (7D)</h2>
+              <InfoTooltip 
+                title='Request Analytics'
+                content='Aggregated system activity combining user search queries and AI neural engine synthesis requests.' 
+              />
+            </div>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
